@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- activity status -->
+    <integer name="status_max_chars">32</integer>
+    <integer name="status_min_chars">2</integer>
+    <!-- name for relation within current user and profile page of a user -->
+    <integer name="relation_self">0</integer>
+    <integer name="relation_no_relation">-1</integer>
+    <integer name="relation_friend">1</integer>
+</resources>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- for dafault value -->
+    <dimen name="default_margin">10dp</dimen>
+    <dimen name="default_padding">4dp</dimen>
+    <dimen name="default_corner">3dp</dimen>
+    <dimen name="default_stroke">3dp</dimen>
+    <dimen name="height_width_zero">0dp</dimen>
+    <dimen name="default_text_size">16dp</dimen>
+    <dimen name="default_text_size_big">24dp</dimen>
+    <dimen name="default_text_size_small">12dp</dimen>
+    <dimen name="default_chat_app_bar_profile_image">40dp</dimen>
+
+    <!-- for dafault value -->
+    <dimen name="padding_input_message">10dp</dimen>
+    <dimen name="default_chat_activity_message_background_radius">15dp</dimen>
+
+    <!-- for start activity -->
+    <dimen name="stroke_thin">1dp</dimen>
+
+    <!-- card view. -->
+    <dimen name="default_text_size_card">16dp</dimen>
+    <dimen name="cardview_default_height">85dp</dimen>
+
+    <dimen name="large_text_size_card">20dp</dimen>
+
+    <dimen name="small_text_size_card">12dp</dimen>
+    <dimen name="padding_view_card">10dp</dimen>
+    <dimen name="radius_card">9dp</dimen>
+    <dimen name="float_card">10dp</dimen>
+    <dimen name="height_card">90dp</dimen>
+    <dimen name="top_margin_card">10dp</dimen>
+    <dimen name="left_right_margin_card">5dp</dimen>
+
+    <!-- for profile activity -->
+    <dimen name="profile_padding_corner_fbs">30dp</dimen>
+
+    <!-- for chat activity -->
+    <dimen name="default_chat_profile_image_recycler_view">60dp</dimen>
+</resources>

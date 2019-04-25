@@ -1,0 +1,77 @@
+<resources>
+    <string name="app_name">RecordIt</string>
+    <string name="default_profile_picture">default_profile</string>
+    <string name="default_thumb_image">default_image</string>
+    <string name="default_status">Offline</string>
+    <string name="online_status">Online</string>
+    <string name="default_profile_picture_file_type">.jpg</string>
+    <string name="default_audio_message_file_type">.3gp</string>
+    <string name="default_date_format">dd-MMMM-YYYY</string>
+
+    <!--name for database users -->
+    <string name="database_user">users</string>
+    <string name="database_user_profile_picture">userImage</string>
+    <string name="database_user_name">userName</string>
+    <string name="database_user_status">userStatus</string>
+    <string name="database_user_thumb_image">userThumbImage</string>
+    <string name="database_user_token">userToken</string>
+
+    <!--name for database friend request -->
+    <string name="database_friend_request">friendRequests</string>
+    <string name="database_friend_request_progress">friend_request_type</string>
+    <string name="database_friend_request_sent">friendRequestSent</string>
+    <string name="database_friend_request_receive">friendRequestReceive</string>
+
+    <!--name for database friend list -->
+    <string name="database_friend_list">friendLists</string>
+    <string name="database_friend_list_date">friendListDate</string>
+
+    <!--name for database notifications-->
+    <string name="database_notification">notifications</string>
+    <string name="database_notification_from">fromUser</string>
+    <string name="database_notification_type">typeNotification</string>
+    <string name="database_notification_type_request">requestingTypeNotification</string>
+
+    <!--name for database message -->
+    <string name="database_message">messages</string>
+    <string name="database_message_input">message</string>
+    <string name="database_message_read_status">readStatus</string>
+    <string name="database_message_type">type</string>
+    <string name="database_message_type_text">text</string>
+    <string name="database_message_type_audio">audio</string>
+    <string name="database_message_time">time</string>
+    <string name="database_message_from">fromUserId</string>
+
+    <!--name for storage-->
+    <string name="storage_profile_pictures">Profile_Images</string>
+    <string name="storage_thumb_image">Thumb_Images</string>
+
+    <!-- status activity-->
+    <string name="status_app_bar_title">Status</string>
+    <string name="status_text_box_hint">Status</string>
+    <string name="status_button">Update status</string>
+    <string name="status_err_empty">Status is empty</string>
+    <string name="status_err_over">Status needs to be below 32 chars</string>
+    <string name="status_err_below">Status needs to be above 2 chars</string>
+    <string name="status_update_success">Status update successfully</string>
+
+    <!-- chat activity-->
+    <string name="chat_message_text_view_hint">Enter message!</string>
+    <string name="chat_activity_err_empty_message">Looks like the message are empty</string>
+    <!-- chat activity chat text message view-->
+    <string name="chat_message_chat_view_message">Display message</string>
+
+    <!-- search user activity-->
+    <string name="search_user_app_bar_title">Status</string>
+
+    <!-- name for extra intent -->
+    <string name="old_status">extra_info_old_status</string>
+    <string name="extra_user_id">extra_info_user_id</string>
+    <string name="extra_user_name">extra_info_user_name</string>
+
+    <!-- name for relation within current user and profile page of a user -->
+    <string name="relation_self">own_profile</string>
+    <string name="relation_no_relation">not_friend</string>
+    <string name="relation_sending_friendRequest">send_friend_request_on_progress</string>
+    <string name="relation_friend">friend</string>
+</resources>

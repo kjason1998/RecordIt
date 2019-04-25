@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activity.ActivityStatus">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+        <include
+            layout="@layout/app_bar_layout"
+            android:id="@+id/status_app_bar">
+        </include>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_width_zero"
+            android:layout_weight="2">
+        </RelativeLayout>
+        <MultiAutoCompleteTextView
+            android:id="@+id/statusEditText"
+            android:hint="@string/status_text_box_hint"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_width_zero"
+            android:layout_weight="1"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_width_zero"
+            android:layout_weight="1">
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/statusButton"
+            android:layout_width="match_parent"
+            android:text="@string/status_button"
+            android:textColor="@color/white"
+            android:layout_height="@dimen/height_width_zero"
+            android:layout_weight="1"
+            android:background="@drawable/round_rectangle_button_dark_gray"
+            android:layout_margin="@dimen/default_margin"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_width_zero"
+            android:layout_weight="6">
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

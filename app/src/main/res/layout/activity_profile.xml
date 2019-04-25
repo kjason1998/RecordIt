@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activity.ActivityProfile"
+    android:background="@color/matt_black">
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_picture"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_width_zero"
+            android:layout_weight="4"
+            android:src="@drawable/default_profile"
+            android:layout_margin="@dimen/default_margin"/>
+        <TextView
+            android:id="@+id/profile_username"
+            android:text="username"
+            android:textSize="@dimen/default_text_size_big"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/height_width_zero"
+            android:layout_weight="1"/>
+        <TextView
+            android:id="@+id/profile_user_status"
+            android:text="user status"
+            android:textSize="@dimen/default_text_size_big"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/height_width_zero"
+            android:layout_weight="1"
+            android:layout_marginBottom="@dimen/default_margin"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_width_zero"
+            android:layout_weight="12"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+                <Button
+                    android:id="@+id/profile_accept_friend_button"
+                    android:text="Accept"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/height_width_zero"
+                    android:layout_weight="1"
+                    android:layout_margin="@dimen/default_margin"
+                    android:background="@drawable/round_rectangle_button_light_green"
+                    android:visibility="gone"/>
+
+                <Button
+                    android:id="@+id/profile_decline_friend_button"
+                    android:text="Decline"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/height_width_zero"
+                    android:layout_weight="1"
+                    android:layout_margin="@dimen/default_margin"
+                    android:background="@color/colorAccent"
+                    android:visibility="gone"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/height_width_zero"
+                android:layout_weight="8">
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/profile_send_friend_request_fbs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="@dimen/profile_padding_corner_fbs"
+        android:layout_marginBottom="@dimen/profile_padding_corner_fbs"
+        android:src="@drawable/add_user_white"
+        app:fabSize="auto" />
+
+</RelativeLayout>

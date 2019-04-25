@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activity.ActivityChat">
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_width_zero"
+            android:layout_weight="12"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/chat_app_bar"
+                layout="@layout/app_bar_layout"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/height_width_zero"
+                android:layout_weight="1">
+            </include>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/chatActivityRecyclerViewMessages"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/height_width_zero"
+                android:layout_weight="8">
+
+            </android.support.v7.widget.RecyclerView>
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/default_padding">
+
+
+            <ImageView
+                android:id="@+id/chatActivityRecordMessageButton"
+                android:layout_width="@dimen/height_width_zero"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/ic_record_microphone"/>
+            <MultiAutoCompleteTextView
+                android:background="@drawable/default_input_message_background"
+                android:id="@+id/chatActivityMessageTextView"
+                android:hint="@string/chat_message_text_view_hint"
+                android:layout_width="@dimen/height_width_zero"
+                android:layout_height="match_parent"
+                android:padding="@dimen/padding_input_message"
+                android:layout_weight="8"/>
+            <ImageView
+                android:id="@+id/chatActivitySendMessageButton"
+                android:layout_width="@dimen/height_width_zero"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/ic_send_message_button"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>
