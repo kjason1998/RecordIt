@@ -1,5 +1,6 @@
 package com.example.kevin.recordit.Activity;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -7,9 +8,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.kevin.recordit.R;
@@ -24,8 +28,22 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
 public class ActivityRegister extends AppCompatActivity {
+    private static final int MIN_PASS_LENG = 7;
+    private static final int MIN_NAME_LENG = 3;
+    private static final int MAX_NAME_LENG = 20;
+
+    private static final String ERR_INPUT_EMPTY = "One or more field are empty";
+    private static final String ERR_PASS_MIN = "Password need to be at least " + MIN_PASS_LENG
+            + " characters";
+    private static final String ERR_NAME_MIN = "Name need to be at least " + MIN_NAME_LENG
+            + " characters";
+    private static final String ERR_NAME_MAX = "Maximum character for name is exceeded, max " + MAX_NAME_LENG
+            + " characters";
+
     private FirebaseAuth mAuth;
     private DatabaseReference mRootRef;
+
+    private LinearLayout background;
 
     private Toolbar mToolbar;
     private ProgressDialog loadingDialog;
@@ -42,6 +60,8 @@ public class ActivityRegister extends AppCompatActivity {
         setContentView(R.layout.register_page);
 
         mAuth = FirebaseAuth.getInstance();
+
+        background = (LinearLayout) findViewById(R.id.register_background);
 
         mToolbar = (Toolbar) findViewById(R.id.register_tool_bar);
         setSupportActionBar(mToolbar);
@@ -65,6 +85,12 @@ public class ActivityRegister extends AppCompatActivity {
                 RegisterAccount(name,email,password);
             }
         });
+        background.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                hideKeyboard(ActivityRegister.this);
+            }
+        });
     }
 
     //using firebase create account
@@ -73,18 +99,26 @@ public class ActivityRegister extends AppCompatActivity {
         //check the EditText validation
         if(TextUtils.isEmpty(name)){
             Toast.makeText
-                    (ActivityRegister.this,"please enter name",Toast.LENGTH_LONG);
+                    (ActivityRegister.this,ERR_INPUT_EMPTY,Toast.LENGTH_LONG).show();
         }
         else if(TextUtils.isEmpty(email)){
             Toast.makeText
-                    (ActivityRegister.this,"please enter Email",Toast.LENGTH_LONG);
+                    (ActivityRegister.this,ERR_INPUT_EMPTY,Toast.LENGTH_LONG).show();
         }
         else if(TextUtils.isEmpty(password)){
             Toast.makeText
-                    (ActivityRegister.this,"please enter password",Toast.LENGTH_LONG);
+                    (ActivityRegister.this,ERR_INPUT_EMPTY,Toast.LENGTH_LONG).show();
+        }else if(name.length() < MIN_NAME_LENG){
+            Toast.makeText
+                    (ActivityRegister.this,ERR_NAME_MIN,Toast.LENGTH_LONG).show();
+        }else if(name.length() > MAX_NAME_LENG){
+            Toast.makeText
+                    (ActivityRegister.this,ERR_NAME_MAX,Toast.LENGTH_LONG).show();
         }
-        else{
-
+        else if(password.length() < MIN_PASS_LENG){
+            Toast.makeText
+                    (ActivityRegister.this,ERR_PASS_MIN,Toast.LENGTH_LONG).show();
+        }else{
             loadingDialog.setTitle("Creating new account");
             loadingDialog.setMessage("Please wait until account created");
             loadingDialog.show();
@@ -128,13 +162,23 @@ public class ActivityRegister extends AppCompatActivity {
                             }
                             else{
                                 Toast.makeText(ActivityRegister.this,
-                                        "Error occur on registering, try again",Toast.LENGTH_LONG);
+                                        "Make sure to have valid Email address " +
+                                                task.toString(),Toast.LENGTH_LONG).show();
                             }
-
                             loadingDialog.dismiss();
                         }
                     });
         }
+    }
 
+    public static void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = activity.getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

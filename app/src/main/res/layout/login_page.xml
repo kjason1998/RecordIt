@@ -6,6 +6,8 @@
     android:layout_height="match_parent"
     tools:context="com.example.kevin.recordit.Activity.ActivityLogin">
     <LinearLayout
+        android:id="@+id/login_background"
+        android:clickable="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"

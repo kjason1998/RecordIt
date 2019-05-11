@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content">
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:id="@+id/message_background"
+    android:clickable="true">
 
     <LinearLayout
         android:id="@+id/receiverLinearLayout"
+        android:clickable="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/default_padding">
@@ -13,7 +16,7 @@
             android:layout_width="@dimen/height_width_zero"
             android:layout_height="@dimen/default_chat_profile_image_recycler_view"
             android:layout_weight="3"
-            android:src="@drawable/default_profile"/>
+            android:src="@drawable/blue_profile_picture"/>
         <TextView
             android:id="@+id/recyclerViewChatMessageTextReceive"
             android:text="@string/chat_message_chat_view_message"
@@ -21,7 +24,7 @@
             android:layout_width="@dimen/height_width_zero"
             android:layout_height="wrap_content"
             android:layout_weight="8"
-            android:background="@drawable/default_message_text_background"
+            android:background="@drawable/default_message_text_background_dark"
             android:layout_margin="@dimen/default_margin"
             android:padding="@dimen/default_padding"/>
         <RelativeLayout
@@ -55,12 +58,13 @@
             android:layout_margin="@dimen/default_margin"
             android:padding="@dimen/default_padding"/>
 
+
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/recyclerViewChatProfileImageSending"
             android:layout_width="@dimen/height_width_zero"
             android:layout_height="@dimen/default_chat_profile_image_recycler_view"
             android:layout_weight="3"
-            android:src="@drawable/default_profile"/>
+            android:src="@drawable/blue_profile_picture"/>
     </LinearLayout>
 
 </RelativeLayout>

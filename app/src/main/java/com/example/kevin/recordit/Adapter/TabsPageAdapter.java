@@ -18,24 +18,21 @@ public class TabsPageAdapter extends FragmentPagerAdapter{
         super(fm);
     }
 
-    //return how many fragment are there (3)
+    //return how many fragment are there (2)
     @Override
     public int getCount() {
-        return 3;
+        return 2;
     }
 
     @Override
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                RequestFragment requestFragment = new RequestFragment();
-                return requestFragment;
+                FriendsFragment friendsFragment = new FriendsFragment();
+                return  friendsFragment;
             case 1:
                 ChatsFragment chatFragment = new ChatsFragment();
                 return chatFragment;
-            case 2:
-                FriendsFragment friendsFragment = new FriendsFragment();
-                return  friendsFragment;
             default:
                 return null;
         }
@@ -44,11 +41,9 @@ public class TabsPageAdapter extends FragmentPagerAdapter{
     public CharSequence getPageTitle(int position) {
         switch (position){
             case 0:
-                return "requests";
+                return "friends";
             case 1:
                 return "chats";
-            case 2:
-                return "friends";
             default:
                 return null;
         }

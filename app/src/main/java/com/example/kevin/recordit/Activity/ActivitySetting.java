@@ -4,10 +4,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.v4.app.SupportActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,7 +42,6 @@ public class ActivitySetting extends AppCompatActivity {
     private TextView settingUserName;
     private TextView settingUserStatus;
 
-    private final static int PICTURE_PICK = 1;
     private StorageReference storageProfilePicturesRef;
 
     private DatabaseReference getUserDataRefrence;
@@ -53,7 +50,6 @@ public class ActivitySetting extends AppCompatActivity {
     private StorageReference storageThumbImageRefrence;
 
     Bitmap thumbBitMap = null;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,43 +71,18 @@ public class ActivitySetting extends AppCompatActivity {
         settingUserName = findViewById(R.id.text_username);
         settingUserStatus = findViewById(R.id.text_user_status);
 
-        getUserDataRefrence.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String name = dataSnapshot
-                        .child(getResources().getString(R.string.database_user_name))
-                        .getValue().toString();
-                String status = dataSnapshot
-                        .child(getResources().getString(R.string.database_user_status))
-                        .getValue().toString();
-                String profilePicture = dataSnapshot
-                        .child(getResources().getString(R.string.database_user_profile_picture))
-                        .getValue().toString();
-                String thumbImage = dataSnapshot
-                        .child(getResources().getString(R.string.database_user_thumb_image))
-                        .getValue().toString();
+        settingUpAcctivity();
+        initEventListener();
+    }
 
-                settingUserName.setText(name);
-                settingUserStatus.setText(status);
-                Log.d("test",profilePicture);
-                //load the profile picture, if not set yet use default pict stored in the app.
-                Picasso.get().load(profilePicture)
-                        .placeholder(R.drawable.default_profile).into(settingUserProfilePicture);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("MyError_AS","onCancelledDatabase");
-            }
-        });
-
+    private void initEventListener() {
         settingUserProfilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent galleryIntent = new Intent();
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent,PICTURE_PICK);
+                CropImage.activity()
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .setAspectRatio(1,1)
+                        .start(ActivitySetting.this);
             }
         });
 
@@ -127,21 +98,42 @@ public class ActivitySetting extends AppCompatActivity {
         });
     }
 
+    private void settingUpAcctivity() {
+        getUserDataRefrence.addValueEventListener(new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            String name = dataSnapshot
+                    .child(getResources().getString(R.string.database_user_name))
+                    .getValue().toString();
+            String status = dataSnapshot
+                    .child(getResources().getString(R.string.database_user_status))
+                    .getValue().toString();
+            String profilePicture = dataSnapshot
+                    .child(getResources().getString(R.string.database_user_profile_picture))
+                    .getValue().toString();
+            String thumbImage = dataSnapshot
+                    .child(getResources().getString(R.string.database_user_thumb_image))
+                    .getValue().toString();
+
+            settingUserName.setText(name);
+            settingUserStatus.setText(status);
+            //load the profile picture, if not set yet use default pict stored in the app.
+            Picasso.get().load(profilePicture)
+                    .placeholder(R.drawable.blue_profile_picture).into(settingUserProfilePicture);
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+        }
+    });
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-
-        if(requestCode==PICTURE_PICK && resultCode==RESULT_OK && data!=null){
-
-            Uri imageUri =  data.getData();
-            // start picker to get image for cropping and then use the image in cropping activity
-            CropImage.activity()
-                    .setGuidelines(CropImageView.Guidelines.ON)
-                    .setAspectRatio(1,1)
-                    .start(ActivitySetting.this);
-        }
-        else if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
+        if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
 
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
@@ -211,8 +203,9 @@ public class ActivitySetting extends AppCompatActivity {
                                                                 new OnCompleteListener<Void>() {
                                                                     @Override
                                                                     public void onComplete(@NonNull Task<Void> task) {
-                                                                        Log.v("Activity setting",
-                                                                                "thumb image are succesfully saved in database");
+                                                                        Toast.makeText(ActivitySetting.this,
+                                                                                getResources().getString(R.string.setting_toast_changing_profile_picture),
+                                                                                Toast.LENGTH_LONG).show();
                                                                     }
                                                                 }
                                                         );
@@ -226,13 +219,18 @@ public class ActivitySetting extends AppCompatActivity {
                         }
                         else{
                             Toast.makeText(ActivitySetting.this,
-                                    "Failed to change profile picture",Toast.LENGTH_LONG);
+                                    getResources().getString(R.string.setting_err_changing_profile_picture),Toast.LENGTH_LONG);
                         }
                     }
                 });
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
+                Toast.makeText(ActivitySetting.this,
+                        error.getMessage(),Toast.LENGTH_LONG);
             }
+        }else{
+            Toast.makeText(ActivitySetting.this,
+                    getResources().getString(R.string.setting_toast_canceled_chaging_profile_picture),Toast.LENGTH_LONG);
         }
     }
 }

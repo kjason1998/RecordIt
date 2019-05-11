@@ -7,13 +7,15 @@
     tools:context=".Activity.ActivityChat">
     
     <LinearLayout
+        android:id="@+id/chat_background"
+        android:clickable="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/height_width_zero"
-            android:layout_weight="12"
+            android:layout_weight="27"
             android:orientation="vertical">
 
             <include
@@ -26,17 +28,20 @@
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/chatActivityRecyclerViewMessages"
+                android:clickable="true"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/height_width_zero"
-                android:layout_weight="8">
+                android:layout_weight="12">
 
             </android.support.v7.widget.RecyclerView>
 
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/default_padding">
+            android:layout_height="@dimen/height_width_zero"
+            android:layout_weight="2"
+            android:gravity="center"
+            android:background="@color/colorPrimary">
 
 
             <ImageView
@@ -44,21 +49,30 @@
                 android:layout_width="@dimen/height_width_zero"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:src="@drawable/ic_record_microphone"/>
+                android:src="@drawable/ic_record_microphone"
+                android:layout_marginLeft="4dp"/>
+            <ImageView
+                android:id="@+id/chatActivityChipmunkFilteredRecordMessageButton"
+                android:layout_width="@dimen/height_width_zero"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/chipmunk_icon"/>
             <MultiAutoCompleteTextView
                 android:background="@drawable/default_input_message_background"
                 android:id="@+id/chatActivityMessageTextView"
                 android:hint="@string/chat_message_text_view_hint"
                 android:layout_width="@dimen/height_width_zero"
-                android:layout_height="match_parent"
-                android:padding="@dimen/padding_input_message"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="3dp"
+                android:padding="3dp"
                 android:layout_weight="8"/>
             <ImageView
                 android:id="@+id/chatActivitySendMessageButton"
                 android:layout_width="@dimen/height_width_zero"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:src="@drawable/ic_send_message_button"/>
+                android:src="@drawable/ic_send_message_button"
+                android:layout_marginHorizontal="4dp"/>
         </LinearLayout>
     </LinearLayout>
 

@@ -3,19 +3,19 @@ package com.example.kevin.recordit.Model;
 public class Message {
     private String message;
     private Boolean readStatus;
-    private Long timeSent;
-    private String messageType;
+    private Long time;
+    private String type;
     private String fromUserId;
 
     public Message() {
     }
 
-    public Message(String message, Boolean readStatus, Long timeSent, String messageType
+    public Message(String message, Boolean readStatus, Long time, String type
     , String fromUserId) {
         this.message = message;
         this.readStatus = readStatus;
-        this.timeSent = timeSent;
-        this.messageType = messageType;
+        this.time = time;
+        this.type = type;
         this.fromUserId = fromUserId;
 
     }
@@ -36,20 +36,12 @@ public class Message {
         this.readStatus = readStatus;
     }
 
-    public Long getTimeSent() {
-        return timeSent;
+    public Long getTime() {
+        return time;
     }
 
-    public void setTimeSent(Long timeSent) {
-        this.timeSent = timeSent;
-    }
-
-    public String getMessageType() {
-        return messageType;
-    }
-
-    public void setMessageType(String messageType) {
-        this.messageType = messageType;
+    public String getType() {
+        return type;
     }
 
     public String getFromUserId() {
@@ -65,8 +57,8 @@ public class Message {
         return "Message{" +
                 "message='" + message + '\'' +
                 ", readStatus=" + readStatus +
-                ", timeSent=" + timeSent +
-                ", messageType='" + messageType + '\'' +
+                ", time=" + time +
+                ", type='" + type + '\'' +
                 ", fromUserId='" + fromUserId + '\'' +
                 '}';
     }

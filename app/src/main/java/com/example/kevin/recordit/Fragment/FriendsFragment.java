@@ -127,7 +127,7 @@ public class FriendsFragment extends Fragment {
                         //load the thumb image(compressed image) if no image are set up yet use default image.
                         Picasso.get().load(dataSnapshot.child(getResources().getString(
                                 R.string.database_user_profile_picture)).getValue().toString())
-                                .placeholder(R.drawable.default_profile).into(holder.profilePicture);
+                                .placeholder(R.drawable.blue_profile_picture).into(holder.profilePicture);
                         holder.profilePicture.setOnClickListener(new View.OnClickListener() {
                             @ Override
                             public void onClick(View v) {

@@ -39,6 +39,7 @@
     <string name="database_message_type">type</string>
     <string name="database_message_type_text">text</string>
     <string name="database_message_type_audio">audio</string>
+    <string name="database_message_type_chipmunk_audio">audioChipmunk</string>
     <string name="database_message_time">time</string>
     <string name="database_message_from">fromUserId</string>
 
@@ -62,7 +63,25 @@
     <string name="chat_message_chat_view_message">Display message</string>
 
     <!-- search user activity-->
-    <string name="search_user_app_bar_title">Status</string>
+    <string name="search_user_app_bar_title">User list</string>
+    <string name="search_user_input_box_hint">Find..</string>
+    <string name="search_user_search_button">Search</string>
+
+    <!-- profile activity-->
+    <string name="profile_toast_adding">User are added waiting for user to accept</string>
+    <string name="profile_toast_canceling_adding">Adding are canceled</string>
+    <string name="profile_err_adding">Error during adding, please try again later</string>
+    <string name="profile_err_canceling_adding">Error during canceling, please try again later</string>
+    <string name="profile_toast_accepting">User are accepted</string>
+    <string name="profile_toast_declining">Declined</string>
+    <string name="profile_err_accepting">Error during accepting, please try again later</string>
+    <string name="profile_err_declining">Error during declining, please try again later</string>
+    <string name="profile_toast_unfriend">Unfriend!</string>
+
+    <!-- setting activity-->
+    <string name="setting_toast_changing_profile_picture">Profile picture is changed</string>
+    <string name="setting_err_changing_profile_picture">There is an error while changing profile picture, make sure it is below 10MB</string>
+    <string name="setting_toast_canceled_chaging_profile_picture">Profile picture is not changed</string>
 
     <!-- name for extra intent -->
     <string name="old_status">extra_info_old_status</string>

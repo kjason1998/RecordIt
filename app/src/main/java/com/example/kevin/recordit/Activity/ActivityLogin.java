@@ -1,5 +1,6 @@
 package com.example.kevin.recordit.Activity;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -8,8 +9,10 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.kevin.recordit.R;
@@ -30,6 +33,8 @@ public class ActivityLogin extends AppCompatActivity {
 
     private Toolbar mToolbar;
     private FirebaseAuth mAuth;
+
+    private LinearLayout background;
 
     private  Button login;
 
@@ -53,6 +58,8 @@ public class ActivityLogin extends AppCompatActivity {
         getSupportActionBar().setTitle("Sign in");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        background = (LinearLayout) findViewById(R.id.login_background);
+
         registerEmail = (EditText) findViewById(R.id.fillTextEmail);
         registerPassword= (EditText) findViewById(R.id.fillTextPassword);
 
@@ -66,6 +73,13 @@ public class ActivityLogin extends AppCompatActivity {
                 String password = registerPassword.getText().toString();
 
                 signIn(email,password);
+            }
+        });
+
+        background.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideKeyboard(ActivityLogin.this);
             }
         });
     }
@@ -128,5 +142,15 @@ public class ActivityLogin extends AppCompatActivity {
                     });
         }
 
+    }
+    public static void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = activity.getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

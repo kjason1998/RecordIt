@@ -1,6 +1,7 @@
 package com.example.kevin.recordit.Activity;
 
 import android.content.Intent;
+import android.preference.PreferenceActivity;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -237,10 +238,13 @@ public class ActivityProfile extends AppCompatActivity {
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
+                                            Toast.makeText(ActivityProfile.this,
+                                                getResources().getString(R.string.profile_toast_unfriend),
+                                                Toast.LENGTH_LONG)
+                                                .show();
                                             addFriendButton.setEnabled(true);
                                             RELATION_CURRENT_USER =
                                                     getResources().getString(R.string.relation_no_relation);
-
                                         }
                                     });
                         }
@@ -302,6 +306,10 @@ public class ActivityProfile extends AppCompatActivity {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if(task.isSuccessful()){
+                                                        Toast.makeText(ActivityProfile.this,
+                                                                getResources().getString(R.string.profile_toast_accepting),
+                                                                Toast.LENGTH_LONG)
+                                                                .show();
                                                         RELATION_CURRENT_USER =
                                                                 getResources().getString(R.string.relation_friend);
                                                         refreshActivity();
@@ -319,6 +327,7 @@ public class ActivityProfile extends AppCompatActivity {
 
     //cancel friend request if friend request is being sent
     private void removeFriendRequest() {
+        //removing sending request from the database
         friendRequestReference
                 .child(getCurrentUserDataReference.getKey())
                 .child(getUserProfileDataReference.getKey())
@@ -326,7 +335,7 @@ public class ActivityProfile extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()){
-
+                    //removing receiving request from the database
                     friendRequestReference
                             .child(getUserProfileDataReference.getKey())
                             .child(getCurrentUserDataReference.getKey())
@@ -334,6 +343,10 @@ public class ActivityProfile extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){
+                                Toast.makeText(ActivityProfile.this,
+                                    getResources().getString(R.string.profile_toast_canceling_adding),
+                                    Toast.LENGTH_LONG)
+                                    .show();
                                 addFriendButton.setEnabled(true);
                                 RELATION_CURRENT_USER =
                                         getResources().getString(R.string.relation_no_relation);
@@ -348,7 +361,7 @@ public class ActivityProfile extends AppCompatActivity {
 
     //to add friend from current user to other user
     private void sendFriendRequestTo() {
-
+        //putting sending request to database
         friendRequestReference
                 .child(getCurrentUserDataReference.getKey())
                 .child(getUserProfileDataReference.getKey())
@@ -358,6 +371,7 @@ public class ActivityProfile extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
+                            //putting receiving request to database
                             friendRequestReference
                                     .child(getUserProfileDataReference.getKey())
                                     .child(getCurrentUserDataReference.getKey())
@@ -367,6 +381,7 @@ public class ActivityProfile extends AppCompatActivity {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if(task.isSuccessful()){
+                                                //putting the request to the database
                                                 HashMap<String,String> notificationDetail =
                                                         new HashMap<String,String>();
                                                 notificationDetail.put
@@ -386,6 +401,10 @@ public class ActivityProfile extends AppCompatActivity {
                                                                     RELATION_CURRENT_USER =
                                                                             getResources().getString(
                                                                                     R.string.relation_sending_friendRequest);
+                                                                    Toast.makeText(ActivityProfile.this,
+                                                                            getResources().getString(R.string.profile_toast_adding),
+                                                                                    Toast.LENGTH_LONG)
+                                                                            .show();
                                                                     refreshActivity();
                                                                 }
                                                             }
@@ -417,7 +436,7 @@ public class ActivityProfile extends AppCompatActivity {
                 userStatus.setText(status);
                 //load the profile picture, if not set yet use default pict stored in the app.
                 Picasso.get().load(profileImageUri)
-                        .placeholder(R.drawable.default_profile).into(profileImage);
+                        .placeholder(R.drawable.blue_profile_picture).into(profileImage);
             }
 
             @Override

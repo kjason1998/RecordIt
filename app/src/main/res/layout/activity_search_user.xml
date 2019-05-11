@@ -18,8 +18,36 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view_users"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            ></android.support.v7.widget.RecyclerView>
+            android:layout_height="@dimen/height_width_zero"
+            android:layout_weight="20">
+
+        </android.support.v7.widget.RecyclerView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_width_zero"
+            android:layout_weight="2"
+            android:gravity="center"
+            android:background="@color/colorPrimary"
+            android:padding="3dp">
+
+            <MultiAutoCompleteTextView
+                android:background="@drawable/default_input_message_background"
+                android:id="@+id/search_user_input_box"
+                android:hint="@string/search_user_input_box_hint"
+                android:layout_width="@dimen/height_width_zero"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="3dp"
+                android:padding="3dp"
+                android:layout_weight="15"/>
+            <Button
+                android:id="@+id/search_user_search_button"
+                android:layout_width="@dimen/height_width_zero"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:text="@string/search_user_search_button"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 

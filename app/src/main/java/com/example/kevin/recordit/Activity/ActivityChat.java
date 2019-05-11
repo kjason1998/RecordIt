@@ -1,9 +1,12 @@
 package com.example.kevin.recordit.Activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.AudioFormat;
+import android.media.AudioRecord;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
@@ -23,8 +26,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,8 +50,12 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,24 +64,29 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ActivityChat extends AppCompatActivity {
+    private static final int MAX_CHARS_MESSAGE = 200;
+    private static final String ERR_MAX_CHAR = "Maximum char is "+MAX_CHARS_MESSAGE+" chars";
     /////////////////////////////for the audio recording///////////////////
     private static final String LOG_TAG = "AudioRecordTest";
-    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
-    private static final int REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION = 100;
     private static String mFileName = null;
+    //temp local file name for storing and retrieving audio file
+    private static String tempFilterAudioName = "tempAudio.pcm";
 
     private StorageReference mStorage;
 
     private MediaRecorder mRecorder = null;
 
     // Requesting permission
-    private boolean permissionToRecordAccepted = false;
-    private boolean permissionToWriteExternalStorage = false;
+    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
+    private static final int REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION = 100;
     private String [] permissionsRecordAudio = {Manifest.permission.RECORD_AUDIO};
     private String [] permissionsWriteExternalStorage = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
     ////////////////////////////////////////////////////////////////////////
 
     private String receiverUserId,receiverName;
+
+    private LinearLayout background;
 
     private Toolbar toolbar;
 
@@ -81,10 +95,13 @@ public class ActivityChat extends AppCompatActivity {
 
     private RecyclerView chatsView;
     private RecyclerView.LayoutManager chatLinearLayout;
-    private RecyclerView.Adapter chatAdapter;
+    private MessageAdapter chatAdapter;
     private List<Message> messageList = new ArrayList<Message>();
 
+    //boolean if button is still press - only for filter bcs of how audio record works
+    private boolean recording;
     private ImageView sendVoiceMessage;
+    private ImageView sendChipmunkVoiceMessage;
     private EditText inputMessage;
     private ImageView sendMessageBytton;
 
@@ -121,15 +138,27 @@ public class ActivityChat extends AppCompatActivity {
         mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
         mFileName += "/audiorecordtest.3gp";
 
-        if (ContextCompat.checkSelfPermission(ActivityChat.this, Manifest.permission.RECORD_AUDIO)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, permissionsRecordAudio, REQUEST_RECORD_AUDIO_PERMISSION);
-        }
+        checkAndRequestPermissions();
+    }
 
-        if (ContextCompat.checkSelfPermission(ActivityChat.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, permissionsWriteExternalStorage, REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION);
+
+    private  boolean checkAndRequestPermissions() {
+        int permissionRecordAudio = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.RECORD_AUDIO);
+        int permissionWriteExternalStorage = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        List<String> listPermissionsNeeded = new ArrayList<>();
+        if (permissionWriteExternalStorage != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
+        if (permissionRecordAudio != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.RECORD_AUDIO);
+        }
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),REQUEST_ID_MULTIPLE_PERMISSIONS);
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -172,7 +201,7 @@ public class ActivityChat extends AppCompatActivity {
                         //change when you want to set offline functions
                         Picasso.get()
                                 .load(thumbProfileImage)
-                                .placeholder(R.drawable.default_profile)
+                                .placeholder(R.drawable.blue_profile_picture)
                                 .into(toolbarReceiverProfilePicture);
                         toolbarReceiverStatus.setText(status);
                     }
@@ -191,6 +220,7 @@ public class ActivityChat extends AppCompatActivity {
      */
     private void setButtonsAndInputMessage() {
         sendVoiceMessage = findViewById(R.id.chatActivityRecordMessageButton);
+        sendChipmunkVoiceMessage = findViewById(R.id.chatActivityChipmunkFilteredRecordMessageButton);
         inputMessage = findViewById(R.id.chatActivityMessageTextView);
         sendMessageBytton = findViewById(R.id.chatActivitySendMessageButton);
 
@@ -198,6 +228,7 @@ public class ActivityChat extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String messageText = inputMessage.getText().toString();
+                //input message check is inside the method sendMessage
                 sendMessage(messageText);
             }
         });
@@ -220,8 +251,40 @@ public class ActivityChat extends AppCompatActivity {
                 return true;
             }
         });
+
+        sendChipmunkVoiceMessage.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                //WHEN PRESS
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+                    Thread recordThread = new Thread(new Runnable(){
+
+                        @Override
+                        public void run() {
+                            recording = true;
+                            startFilterRecord();
+                        }
+
+                    });
+                    recordThread.start();
+                    Toast.makeText(ActivityChat.this,"start recording"
+                            ,Toast.LENGTH_LONG).show();
+                }//WHEN RELEASE
+                else if(motionEvent.getAction() == MotionEvent.ACTION_UP){
+                    recording = false;
+                    Toast.makeText(ActivityChat.this,"stop recording"
+                            ,Toast.LENGTH_LONG).show();
+                }
+
+                return true;
+            }
+        });
     }
 
+    /**
+     * start recording normal voice message
+     * start when button is push
+     */
     private void startRecording() {
         mRecorder = new MediaRecorder();
         mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -238,6 +301,10 @@ public class ActivityChat extends AppCompatActivity {
         mRecorder.start();
     }
 
+    /**
+     * stop recording normal voice message
+     * stop when button is released
+     */
     private void stopRecording() {
         mRecorder.stop();
         mRecorder.release();
@@ -249,13 +316,59 @@ public class ActivityChat extends AppCompatActivity {
         //uploadAudio();
     }
 
+    /**
+     * start the recording using audio recorder - voice message that going to be filter
+     * this example have 15000 hz input ( the drop down does not effect the input audio)
+     */
+    private void startFilterRecord(){
+
+        File file = new File(Environment.getExternalStorageDirectory(), tempFilterAudioName);
+
+        try {
+            file.createNewFile();
+
+            OutputStream outputStream = new FileOutputStream(file);
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);
+            DataOutputStream dataOutputStream = new DataOutputStream(bufferedOutputStream);
+
+            int minBufferSize = AudioRecord.getMinBufferSize(15000,
+                    AudioFormat.CHANNEL_IN_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT);
+
+            short[] audioData = new short[minBufferSize];
+
+            AudioRecord audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
+                    15000,
+                    AudioFormat.CHANNEL_IN_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT,
+                    minBufferSize);
+
+            audioRecord.startRecording();
+
+            while(recording){
+                int numberOfShort = audioRecord.read(audioData, 0, minBufferSize);
+                for(int i = 0; i < numberOfShort; i++){
+                    dataOutputStream.writeShort(audioData[i]);
+                }
+            }
+
+            audioRecord.stop();
+            dataOutputStream.close();
+            putMessageToFirebase("LINK AUDIO FILE",
+                    getResources().getString(R.string.database_message_type_chipmunk_audio));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     private void uploadAudio(final String messageUniqeId, final String thisOnlineUserId, final String receiverUserId) {
         final StorageReference filepath = mStorage.child("Audio").child(
                 messageUniqeId+ getResources().getString(R.string.default_audio_message_file_type));
 
         final Uri uri = Uri.fromFile(new File(mFileName).getAbsoluteFile());
 
-        Log.d(LOG_TAG,uri.toString());
         filepath.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -264,9 +377,44 @@ public class ActivityChat extends AppCompatActivity {
                 filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     public void onSuccess(Uri uri) {
                         Uri downloadUri = uri;
-                        Log.d(LOG_TAG,downloadUri.toString());
                         String downloadLinkAudio = downloadUri.toString();
-                        Log.d(LOG_TAG,"downloadLink:"+downloadLinkAudio);
+                        rootReference
+                                .child(getResources().getString(R.string.database_message))
+                                .child(thisOnlineUserId)
+                                .child(receiverUserId)
+                                .child(messageUniqeId)
+                                .child(getResources().getString(R.string.database_message_input))
+                                .setValue(downloadLinkAudio);
+                        rootReference
+                                .child(getResources().getString(R.string.database_message))
+                                .child(receiverUserId)
+                                .child(thisOnlineUserId)
+                                .child(messageUniqeId)
+                                .child(getResources().getString(R.string.database_message_input))
+                                .setValue(downloadLinkAudio);
+                    }
+                });
+            }
+        });
+    }
+
+    private void uploadFilteredAudio(final String messageUniqeId, final String thisOnlineUserId, final String receiverUserId) {
+        final StorageReference filepath = mStorage.child("Audio").child(
+                messageUniqeId+ getResources().getString(R.string.default_audio_message_file_type));
+
+        File file = new File(Environment.getExternalStorageDirectory(), tempFilterAudioName);
+        final Uri uri = Uri.fromFile(file);
+
+        filepath.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(ActivityChat.this,"uploaded succesfully",Toast.LENGTH_LONG)
+                        .show();
+                filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    public void onSuccess(Uri uri) {
+                        Uri downloadUri = uri;
+                        String downloadLinkAudio = downloadUri.toString();
+
                         rootReference
                                 .child(getResources().getString(R.string.database_message))
                                 .child(thisOnlineUserId)
@@ -291,6 +439,10 @@ public class ActivityChat extends AppCompatActivity {
         if(messageText.isEmpty()){
             Toast.makeText(ActivityChat.this,
                     getResources().getString(R.string.chat_activity_err_empty_message),
+                    Toast.LENGTH_LONG).show();
+        }else if(messageText.length() == MAX_CHARS_MESSAGE){
+            Toast.makeText(ActivityChat.this,
+                    ERR_MAX_CHAR,
                     Toast.LENGTH_LONG).show();
         }
         else{
@@ -336,15 +488,24 @@ public class ActivityChat extends AppCompatActivity {
             messageDetailHashmap.put(getResources().getString(R.string.database_message_input),messageText);
             messageDetailHashmap.put(getResources().getString(R.string.database_message_type),
                     getResources().getString(R.string.database_message_type_text));
-        }else{
+        }else if(typeMessage.equalsIgnoreCase(
+                getResources().getString(R.string.database_message_type_chipmunk_audio)))
+        {
+            uploadFilteredAudio(messageUniqeId,thisOnlineUserId,receiverUserId);
+            messageDetailHashmap.put(getResources().getString(R.string.database_message_type),
+                    getResources().getString(R.string.database_message_type_chipmunk_audio));
+            messageDetailHashmap.put(getResources().getString(R.string.database_message_input),
+                    "link file");
+
+        }
+            else
+            {
             uploadAudio(messageUniqeId,thisOnlineUserId,receiverUserId);
             messageDetailHashmap.put(getResources().getString(R.string.database_message_type),
                     getResources().getString(R.string.database_message_type_audio));
             messageDetailHashmap.put(getResources().getString(R.string.database_message_input),
                     "link file");
-
-            Log.d(LOG_TAG,"test2");
-        }
+            }
 
         Map messageHashmap = new HashMap();
 
@@ -371,21 +532,17 @@ public class ActivityChat extends AppCompatActivity {
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
                         Message dataMessage = dataSnapshot.getValue(Message.class);
-
                         messageList.add(dataMessage);
-
                         chatAdapter.notifyDataSetChanged();
-                        Log.d("ActivityChat,onChildAdded", messageList.toString());
+
                     }
 
                     @Override
                     public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                         Message dataMessage = dataSnapshot.getValue(Message.class);
-                        //edit the newly changed data - for now it is special only for audio file
                         messageList.set(messageList.size()-1,dataMessage);
-                        Log.d("ActivityChat,onChildChanged", dataMessage.getMessage());
-                        Log.d("ActivityChat,onChildChanged", messageList.toString());
                         chatAdapter.notifyDataSetChanged();
                     }
 
@@ -411,9 +568,20 @@ public class ActivityChat extends AppCompatActivity {
         chatLinearLayout = new LinearLayoutManager(this);
         chatsView.setLayoutManager(chatLinearLayout);
 
-        // specify an adapter (see also next example)
+        // specify an adapter
         chatAdapter = new MessageAdapter(messageList);
         chatsView.setAdapter(chatAdapter);
         chatsView.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    public static void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = activity.getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }
