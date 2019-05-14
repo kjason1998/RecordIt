@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +38,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
 
 public class ActivitySetting extends AppCompatActivity {
+    private Toolbar mToolbar;
 
     private CircleImageView settingUserProfilePicture;
     private TextView settingUserName;
@@ -70,9 +72,17 @@ public class ActivitySetting extends AppCompatActivity {
         settingUserProfilePicture = findViewById(R.id.setting_user_profile_picture);
         settingUserName = findViewById(R.id.text_username);
         settingUserStatus = findViewById(R.id.text_user_status);
+        mToolbar = findViewById(R.id.setting_app_bar);
+        setMToolbar();
 
         settingUpAcctivity();
         initEventListener();
+    }
+
+    private void setMToolbar() {
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle(getResources().getString(R.string.setting_app_bar_title));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void initEventListener() {

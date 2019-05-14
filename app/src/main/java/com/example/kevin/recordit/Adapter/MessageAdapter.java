@@ -133,6 +133,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
             if(messageType.equalsIgnoreCase(
                     context.getResources().getString(R.string.database_message_type_audio)))
             {//MSG TYPE = audio
+
+                holder.messageTextViewSending.setText("Click to play");
                 holder.messageTextViewSending.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -145,6 +147,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
             else if(messageType.equalsIgnoreCase(
                     context.getResources().getString(R.string.database_message_type_chipmunk_audio)))
             {//MSG TYPE = chipmunk audio
+                holder.messageTextViewSending.setText("Click to play");
                 holder.messageTextViewSending.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -169,7 +172,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
             if(messageType.equalsIgnoreCase(
                     context.getResources().getString(R.string.database_message_type_audio)))
             {//MSG TYPE = audio
-
+                holder.messageTextViewReceiving.setText("Click to play");
                 holder.messageTextViewReceiving.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -182,6 +185,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
             else if(messageType.equalsIgnoreCase(
                     context.getResources().getString(R.string.database_message_type_chipmunk_audio)))
             {//MSG TYPE = chipmunk audio
+                holder.messageTextViewReceiving.setText("Click to play");
                 holder.messageTextViewReceiving.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

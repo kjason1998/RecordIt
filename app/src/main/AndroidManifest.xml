@@ -29,7 +29,8 @@
         <activity
             android:name=".Activity.ActivityRegister"
             android:parentActivityName=".Activity.ActivityStart" />
-        <activity android:name=".Activity.ActivitySetting" />
+        <activity android:name=".Activity.ActivitySetting"
+            android:parentActivityName=".Activity.ActivityMain"/>
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" /> <!-- optional (needed if default theme has no action bar) -->
@@ -39,7 +40,8 @@
         <activity
             android:name=".Activity.ActivitySearchUser"
             android:parentActivityName=".Activity.ActivityMain" />
-        <activity android:name=".Activity.ActivityProfile" />
+        <activity android:name=".Activity.ActivityProfile"
+            android:parentActivityName=".Activity.ActivityMain"/>
         <activity android:name=".Activity.ActivityChat"
             android:parentActivityName=".Activity.ActivityMain" />
     </application>

@@ -17,16 +17,20 @@
             android:layout_height="@dimen/default_chat_profile_image_recycler_view"
             android:layout_weight="3"
             android:src="@drawable/blue_profile_picture"/>
-        <TextView
-            android:id="@+id/recyclerViewChatMessageTextReceive"
-            android:text="@string/chat_message_chat_view_message"
-            android:textColor="@color/white"
+        <RelativeLayout
             android:layout_width="@dimen/height_width_zero"
             android:layout_height="wrap_content"
-            android:layout_weight="8"
-            android:background="@drawable/default_message_text_background_dark"
-            android:layout_margin="@dimen/default_margin"
-            android:padding="@dimen/default_padding"/>
+            android:layout_weight="8">
+            <TextView
+                android:id="@+id/recyclerViewChatMessageTextReceive"
+                android:text="@string/chat_message_chat_view_message"
+                android:textColor="@color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/default_message_text_background_dark"
+                android:layout_margin="@dimen/default_margin"
+                android:padding="@dimen/default_padding"/>
+        </RelativeLayout>
         <RelativeLayout
             android:layout_width="@dimen/height_width_zero"
             android:layout_height="@dimen/height_width_zero"
@@ -47,16 +51,24 @@
 
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/recyclerViewChatMessageTextSending"
-            android:text="@string/chat_message_chat_view_message"
-            android:textColor="@color/white"
+
+        <RelativeLayout
             android:layout_width="@dimen/height_width_zero"
             android:layout_height="wrap_content"
             android:layout_weight="8"
-            android:background="@drawable/default_message_text_background"
-            android:layout_margin="@dimen/default_margin"
-            android:padding="@dimen/default_padding"/>
+            android:gravity="right">
+
+
+            <TextView
+                android:id="@+id/recyclerViewChatMessageTextSending"
+                android:text="@string/chat_message_chat_view_message"
+                android:textColor="@color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/default_message_text_background"
+                android:layout_margin="@dimen/default_margin"
+                android:padding="@dimen/default_padding"/>
+        </RelativeLayout>
 
 
         <de.hdodenhof.circleimageview.CircleImageView

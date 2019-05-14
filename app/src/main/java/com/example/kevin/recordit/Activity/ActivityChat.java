@@ -529,6 +529,7 @@ public class ActivityChat extends AppCompatActivity {
                 .child(getResources().getString(R.string.database_message))
                 .child(thisOnlineUserId)
                 .child(receiverUserId)
+                .orderByChild("time")
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {

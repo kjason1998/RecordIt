@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -31,6 +32,7 @@ import java.util.HashMap;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ActivityProfile extends AppCompatActivity {
+    private Toolbar mToolbar;
 
     private String RELATION_CURRENT_USER;
 
@@ -56,6 +58,9 @@ public class ActivityProfile extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        mToolbar = findViewById(R.id.profile_app_bar);
+        setMToolbar();
 
         RELATION_CURRENT_USER = getResources().getString(R.string.relation_no_relation);
 
@@ -101,6 +106,12 @@ public class ActivityProfile extends AppCompatActivity {
         //friend request of the viewed user.
         setButton(getCurrentUserDataReference,getUserProfileDataReference);
 
+    }
+
+    private void setMToolbar() {
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle(getResources().getString(R.string.profile_app_bar_title));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void setButton(final DatabaseReference getCurrentUserDataReference,

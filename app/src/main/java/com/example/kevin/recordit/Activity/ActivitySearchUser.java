@@ -82,10 +82,11 @@ public class ActivitySearchUser extends AppCompatActivity {
     private void searchUser(){
         String usernameSearched = searchBar.getText().toString();
         if(TextUtils.isEmpty(usernameSearched)){
+            setRecyclerView("");
             Toast.makeText(ActivitySearchUser.this,ERR_EMPTY_SEARCH_BAR,Toast.LENGTH_LONG)
                     .show();
         }else{
-            setRecyclerView(usernameSearched.toLowerCase());
+            setRecyclerView(usernameSearched);
         }
     }
 
@@ -100,7 +101,8 @@ public class ActivitySearchUser extends AppCompatActivity {
                 .getReference()
                 .child(getResources().getString(R.string.database_user))
                 .orderByChild("userName")
-                .startAt(userName)
+                .startAt(userName.toUpperCase())
+                .endAt(userName.toLowerCase()+"\uf8ff")
                 .limitToLast(25);
 
         FirebaseRecyclerOptions<User> options =

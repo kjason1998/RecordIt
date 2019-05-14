@@ -6,6 +6,10 @@
     android:layout_height="match_parent"
     tools:context="com.example.kevin.recordit.Activity.ActivitySetting"
     android:background="@color/matt_black">
+    <include
+        layout="@layout/app_bar_layout"
+        android:id="@+id/setting_app_bar">
+    </include>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,7 +22,7 @@
             android:id="@+id/setting_user_profile_picture"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:src="@drawable/default_profile"
+            android:src="@drawable/blue_profile_picture"
             android:layout_marginTop="75dp"
             android:clickable="true"/>
 

@@ -68,6 +68,7 @@
     <string name="search_user_search_button">Search</string>
 
     <!-- profile activity-->
+    <string name="profile_app_bar_title">Profile</string>
     <string name="profile_toast_adding">User are added waiting for user to accept</string>
     <string name="profile_toast_canceling_adding">Adding are canceled</string>
     <string name="profile_err_adding">Error during adding, please try again later</string>
@@ -79,6 +80,7 @@
     <string name="profile_toast_unfriend">Unfriend!</string>
 
     <!-- setting activity-->
+    <string name="setting_app_bar_title">Setting</string>
     <string name="setting_toast_changing_profile_picture">Profile picture is changed</string>
     <string name="setting_err_changing_profile_picture">There is an error while changing profile picture, make sure it is below 10MB</string>
     <string name="setting_toast_canceled_chaging_profile_picture">Profile picture is not changed</string>
