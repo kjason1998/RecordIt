@@ -70,7 +70,8 @@ public class ActivityChat extends AppCompatActivity {
     private static final String LOG_TAG = "AudioRecordTest";
     private static String mFileName = null;
     //temp local file name for storing and retrieving audio file
-    private static String tempFilterAudioName = "tempAudio.pcm";
+    private static String TEMP_FILTER_AUDIO_NAME = "tempAudio.pcm";
+    private static String TEMP_FILE_AUDIO_NAME = "/audiorecordtest.3gp";
 
     private StorageReference mStorage;
 
@@ -78,15 +79,9 @@ public class ActivityChat extends AppCompatActivity {
 
     // Requesting permission
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
-    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
-    private static final int REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION = 100;
-    private String [] permissionsRecordAudio = {Manifest.permission.RECORD_AUDIO};
-    private String [] permissionsWriteExternalStorage = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
     ////////////////////////////////////////////////////////////////////////
 
     private String receiverUserId,receiverName;
-
-    private LinearLayout background;
 
     private Toolbar toolbar;
 
@@ -136,7 +131,7 @@ public class ActivityChat extends AppCompatActivity {
         setRecyclerView();
 
         mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
-        mFileName += "/audiorecordtest.3gp";
+        mFileName += TEMP_FILE_AUDIO_NAME;
 
         checkAndRequestPermissions();
     }
@@ -239,12 +234,14 @@ public class ActivityChat extends AppCompatActivity {
                 //WHEN PRESS
                 if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
                     startRecording();
-                    Toast.makeText(ActivityChat.this,"start recording"
+                    Toast.makeText(ActivityChat.this,
+                            getResources().getString(R.string.chat_toast_start_record)
                             ,Toast.LENGTH_LONG).show();
                 }//WHEN RELEASE
                 else if(motionEvent.getAction() == MotionEvent.ACTION_UP){
                     stopRecording();
-                    Toast.makeText(ActivityChat.this,"stop recording"
+                    Toast.makeText(ActivityChat.this,
+                            getResources().getString(R.string.chat_toast_stop_record)
                             ,Toast.LENGTH_LONG).show();
                 }
 
@@ -267,12 +264,14 @@ public class ActivityChat extends AppCompatActivity {
 
                     });
                     recordThread.start();
-                    Toast.makeText(ActivityChat.this,"start recording"
+                    Toast.makeText(ActivityChat.this,
+                            getResources().getString(R.string.chat_toast_start_record)
                             ,Toast.LENGTH_LONG).show();
                 }//WHEN RELEASE
                 else if(motionEvent.getAction() == MotionEvent.ACTION_UP){
                     recording = false;
-                    Toast.makeText(ActivityChat.this,"stop recording"
+                    Toast.makeText(ActivityChat.this,
+                            getResources().getString(R.string.chat_toast_stop_record)
                             ,Toast.LENGTH_LONG).show();
                 }
 
@@ -322,7 +321,7 @@ public class ActivityChat extends AppCompatActivity {
      */
     private void startFilterRecord(){
 
-        File file = new File(Environment.getExternalStorageDirectory(), tempFilterAudioName);
+        File file = new File(Environment.getExternalStorageDirectory(), TEMP_FILTER_AUDIO_NAME);
 
         try {
             file.createNewFile();
@@ -364,7 +363,7 @@ public class ActivityChat extends AppCompatActivity {
     }
 
     private void uploadAudio(final String messageUniqeId, final String thisOnlineUserId, final String receiverUserId) {
-        final StorageReference filepath = mStorage.child("Audio").child(
+        final StorageReference filepath = mStorage.child(getResources().getString(R.string.storage_audio)).child(
                 messageUniqeId+ getResources().getString(R.string.default_audio_message_file_type));
 
         final Uri uri = Uri.fromFile(new File(mFileName).getAbsoluteFile());
@@ -372,7 +371,8 @@ public class ActivityChat extends AppCompatActivity {
         filepath.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(ActivityChat.this,"uploaded succesfully",Toast.LENGTH_LONG)
+                Toast.makeText(ActivityChat.this,
+                        getResources().getString(R.string.chat_toast_audio),Toast.LENGTH_LONG)
                         .show();
                 filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     public void onSuccess(Uri uri) {
@@ -402,13 +402,14 @@ public class ActivityChat extends AppCompatActivity {
         final StorageReference filepath = mStorage.child("Audio").child(
                 messageUniqeId+ getResources().getString(R.string.default_audio_message_file_type));
 
-        File file = new File(Environment.getExternalStorageDirectory(), tempFilterAudioName);
+        File file = new File(Environment.getExternalStorageDirectory(), TEMP_FILTER_AUDIO_NAME);
         final Uri uri = Uri.fromFile(file);
 
         filepath.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(ActivityChat.this,"uploaded succesfully",Toast.LENGTH_LONG)
+                Toast.makeText(ActivityChat.this,
+                        getResources().getString(R.string.chat_toast_audio),Toast.LENGTH_LONG)
                         .show();
                 filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     public void onSuccess(Uri uri) {
@@ -516,9 +517,8 @@ public class ActivityChat extends AppCompatActivity {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 if(databaseError != null){
-                    Log.e("ActivityChat update children error",databaseError.getMessage().toString());
+                    Log.e(LOG_TAG,databaseError.getMessage());
                 }
-
                 inputMessage.setText(null);
             }
         });
@@ -529,12 +529,14 @@ public class ActivityChat extends AppCompatActivity {
                 .child(getResources().getString(R.string.database_message))
                 .child(thisOnlineUserId)
                 .child(receiverUserId)
-                .orderByChild("time")
+                .orderByChild(getResources().getString(R.string.database_message_time))
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
+                        Log.d(LOG_TAG,"onChildAdded");
+                        Log.d(LOG_TAG,"onChildChanged before adding: " + messageList);
                         Message dataMessage = dataSnapshot.getValue(Message.class);
+                        Log.d(LOG_TAG,"onChildChanged after adding: " + messageList);
                         messageList.add(dataMessage);
                         chatAdapter.notifyDataSetChanged();
 
@@ -544,21 +546,28 @@ public class ActivityChat extends AppCompatActivity {
                     public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                         Message dataMessage = dataSnapshot.getValue(Message.class);
                         messageList.set(messageList.size()-1,dataMessage);
+                        Log.d(LOG_TAG,"onChildChanged" + dataSnapshot);
+                        Log.d(LOG_TAG,"onChildChanged arraylist: " + messageList);
                         chatAdapter.notifyDataSetChanged();
                     }
 
                     @Override
                     public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
+                        Log.d(LOG_TAG,"onChildRemoved" + dataSnapshot);
+                        Log.d(LOG_TAG,"onChildRemoved arraylist: " + messageList);
+                        chatAdapter.notifyDataSetChanged();
                     }
 
                     @Override
                     public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
+                        Log.d(LOG_TAG,"onChildMoved " + dataSnapshot + s);
+                        Log.d(LOG_TAG,"onChildMoved arraylist: " + messageList);
+                        chatAdapter.notifyDataSetChanged();
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.d("test","cancelled");
 
                     }
                 });
@@ -573,16 +582,5 @@ public class ActivityChat extends AppCompatActivity {
         chatAdapter = new MessageAdapter(messageList);
         chatsView.setAdapter(chatAdapter);
         chatsView.setItemAnimator(new DefaultItemAnimator());
-    }
-
-    public static void hideKeyboard(Activity activity) {
-        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        //Find the currently focused view, so we can grab the correct window token from it.
-        View view = activity.getCurrentFocus();
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
-        if (view == null) {
-            view = new View(activity);
-        }
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

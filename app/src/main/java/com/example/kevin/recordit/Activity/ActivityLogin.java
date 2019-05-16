@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -53,17 +54,17 @@ public class ActivityLogin extends AppCompatActivity {
         userRefrence = FirebaseDatabase.getInstance().getReference()
                 .child(getResources().getString(R.string.database_user));
 
-        mToolbar = (Toolbar) findViewById(R.id.login_tool_bar);
+        mToolbar = findViewById(R.id.login_tool_bar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Sign in");
+        getSupportActionBar().setTitle(getResources().getString(R.string.login_app_bar_title));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        background = (LinearLayout) findViewById(R.id.login_background);
+        background = findViewById(R.id.login_background);
 
-        registerEmail = (EditText) findViewById(R.id.fillTextEmail);
-        registerPassword= (EditText) findViewById(R.id.fillTextPassword);
+        registerEmail = findViewById(R.id.fillTextEmail);
+        registerPassword=  findViewById(R.id.fillTextPassword);
 
-        login = (Button) findViewById(R.id.buttonEnter);
+        login = findViewById(R.id.buttonEnter);
         loadingDialog = new ProgressDialog(this);
 
         login.setOnClickListener(new View.OnClickListener() {
@@ -90,16 +91,16 @@ public class ActivityLogin extends AppCompatActivity {
         //check the EditText validation
         if(TextUtils.isEmpty(email)){
             Toast.makeText
-                    (ActivityLogin.this,"please enter Email",Toast.LENGTH_LONG);
+                    (ActivityLogin.this,getResources().getString(R.string.login_err_email_empty),Toast.LENGTH_LONG);
         }
         else if(TextUtils.isEmpty(password)){
             Toast.makeText
-                    (ActivityLogin.this,"please enter Password",Toast.LENGTH_LONG);
+                    (ActivityLogin.this,getResources().getString(R.string.login_err_password_empty),Toast.LENGTH_LONG);
         }
         else{
             //initiate the loading bar if the email and password are not empty.
-            loadingDialog.setTitle("Logging in");
-            loadingDialog.setMessage("Please wait a moment");
+            loadingDialog.setTitle(getResources().getString(R.string.login_loading_dialog_title));
+            loadingDialog.setMessage(getResources().getString(R.string.login_loading_dialog_message));
             loadingDialog.show();
 
             mAuth.signInWithEmailAndPassword(email, password)
@@ -133,8 +134,14 @@ public class ActivityLogin extends AppCompatActivity {
                                 });
                             }
                             else{
+                                /*Snackbar.make(findViewById(R.id.login_background),
+                                        R.string.login_err_email_password_incorrect,
+                                        Snackbar.LENGTH_SHORT)
+                                        .show();*/
+
                                 Toast.makeText(ActivityLogin.this,
-                                        "Email or password are incorrect",Toast.LENGTH_LONG);
+                                        getResources().getString(R.string.login_err_email_password_incorrect),
+                                        Toast.LENGTH_LONG).show();
                             }
                             //dismissing the loading bar
                             loadingDialog.dismiss();

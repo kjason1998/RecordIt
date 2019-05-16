@@ -21,6 +21,7 @@
                 android:id="@+id/profile_app_bar">
             </include>
         </LinearLayout>
+
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profile_picture"
             android:layout_width="match_parent"

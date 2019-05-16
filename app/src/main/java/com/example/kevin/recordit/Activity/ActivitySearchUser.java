@@ -47,8 +47,8 @@ public class ActivitySearchUser extends AppCompatActivity {
         usersRecyclerView.setHasFixedSize(true);
         usersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        searchBar= (MultiAutoCompleteTextView) findViewById(R.id.search_user_input_box);
-        searchButton = (Button) findViewById(R.id.search_user_search_button);
+        searchBar = findViewById(R.id.search_user_input_box);
+        searchButton =  findViewById(R.id.search_user_search_button);
 
         initListeners();
     }
@@ -82,21 +82,21 @@ public class ActivitySearchUser extends AppCompatActivity {
     private void searchUser(){
         String usernameSearched = searchBar.getText().toString();
         if(TextUtils.isEmpty(usernameSearched)){
-            setRecyclerView("");
+            fetch("");
             Toast.makeText(ActivitySearchUser.this,ERR_EMPTY_SEARCH_BAR,Toast.LENGTH_LONG)
                     .show();
         }else{
-            setRecyclerView(usernameSearched);
+            fetch(usernameSearched);
         }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        setRecyclerView("");
+        fetch("");
     }
 
-    public void setRecyclerView(String userName){
+    public void fetch(String userName){
         Query query = FirebaseDatabase.getInstance()
                 .getReference()
                 .child(getResources().getString(R.string.database_user))
@@ -132,7 +132,6 @@ public class ActivitySearchUser extends AppCompatActivity {
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @ Override
                     public void onClick(View v) {
-
                         String userId = getRef(position).getKey();
                         goToProfileActivity(userId);
                     }

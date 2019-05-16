@@ -40,7 +40,7 @@ public class ActivityMain extends AppCompatActivity {
 
         mToolbar = (Toolbar) findViewById(R.id.home_page_toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("RecordIt");
+        getSupportActionBar().setTitle(getResources().getString(R.string.main_app_bar_title));
     }
 
     @Override
@@ -63,8 +63,7 @@ public class ActivityMain extends AppCompatActivity {
     private void LogOutUser() {
         Intent startPageIntent =
                 new Intent(ActivityMain.this,ActivityStart.class);
-
-
+        //make sure people can not go back in again
         startPageIntent.addFlags
                 (Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(startPageIntent);

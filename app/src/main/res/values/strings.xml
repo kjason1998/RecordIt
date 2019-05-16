@@ -46,6 +46,18 @@
     <!--name for storage-->
     <string name="storage_profile_pictures">Profile_Images</string>
     <string name="storage_thumb_image">Thumb_Images</string>
+    <string name="storage_audio">Audio</string>
+
+    <!-- login activity-->
+    <string name="login_app_bar_title">Sign in</string>
+    <string name="login_err_email_empty">Please enter Email</string>
+    <string name="login_err_password_empty">Please enter password</string>
+    <string name="login_loading_dialog_title">Logging in</string>
+    <string name="login_loading_dialog_message">Please wait a moment</string>
+    <string name="login_err_email_password_incorrect">Email or password is incorrect</string>
+
+    <!-- Main activity-->
+    <string name="main_app_bar_title">RecordIt</string>
 
     <!-- status activity-->
     <string name="status_app_bar_title">Status</string>
@@ -59,6 +71,10 @@
     <!-- chat activity-->
     <string name="chat_message_text_view_hint">Enter message!</string>
     <string name="chat_activity_err_empty_message">Looks like the message are empty</string>
+    <string name="chat_toast_audio">Audio sent</string>
+    <string name="chat_err_audio">Audio did not sent</string>
+    <string name="chat_toast_start_record">Start speaking</string>
+    <string name="chat_toast_stop_record">Audio recorded, will send shortly</string>
     <!-- chat activity chat text message view-->
     <string name="chat_message_chat_view_message">Display message</string>
 
