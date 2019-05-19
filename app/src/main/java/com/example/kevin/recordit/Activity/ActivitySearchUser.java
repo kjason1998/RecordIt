@@ -26,7 +26,6 @@ import com.google.firebase.database.Query;
 import com.squareup.picasso.Picasso;
 
 public class ActivitySearchUser extends AppCompatActivity {
-    private static String ERR_EMPTY_SEARCH_BAR = "Username is empty";
 
     private Toolbar mToolbar;
     private RecyclerView usersRecyclerView;
@@ -83,7 +82,9 @@ public class ActivitySearchUser extends AppCompatActivity {
         String usernameSearched = searchBar.getText().toString();
         if(TextUtils.isEmpty(usernameSearched)){
             fetch("");
-            Toast.makeText(ActivitySearchUser.this,ERR_EMPTY_SEARCH_BAR,Toast.LENGTH_LONG)
+            Toast.makeText(ActivitySearchUser.this,
+                    getResources().getString(R.string.search_user_err_empty),
+                    Toast.LENGTH_LONG)
                     .show();
         }else{
             fetch(usernameSearched);
@@ -100,7 +101,7 @@ public class ActivitySearchUser extends AppCompatActivity {
         Query query = FirebaseDatabase.getInstance()
                 .getReference()
                 .child(getResources().getString(R.string.database_user))
-                .orderByChild("userName")
+                .orderByChild(getResources().getString(R.string.database_user_name))
                 .startAt(userName.toUpperCase())
                 .endAt(userName.toLowerCase()+"\uf8ff")
                 .limitToLast(25);

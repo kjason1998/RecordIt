@@ -1,43 +1,32 @@
 package com.example.kevin.recordit.Adapter;
 
-import android.Manifest;
+
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.os.StrictMode;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.kevin.recordit.Activity.ActivityChat;
 import com.example.kevin.recordit.Model.Message;
 import com.example.kevin.recordit.R;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.example.kevin.recordit.ViewHolder.MessageHolder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FileDownloadTask;
-import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.io.BufferedInputStream;
@@ -57,7 +46,7 @@ import java.util.concurrent.ExecutionException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHolder> implements MediaPlayer.OnPreparedListener{
+public class MessageAdapter extends RecyclerView.Adapter<MessageHolder> implements MediaPlayer.OnPreparedListener{
 
     private static String tempFilterAudioName = "tempAudio.3gp";
 
@@ -72,55 +61,25 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
         this.messageList = messageList;
     }
 
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
-
-        // each data item is just a string in this case
-        public RelativeLayout background;
-        public LinearLayout receivingLayout;
-        public LinearLayout sendingLayout;
-        public TextView messageTextViewReceiving;
-        public CircleImageView profileImageCircleViewReceiving;
-        public TextView messageTextViewSending;
-        public CircleImageView profileImageCircleViewSending;
-        public MyViewHolder(View v) {
-            super(v);
-            background = v.findViewById(R.id.message_background);
-            receivingLayout = v.findViewById(R.id.receiverLinearLayout);
-            sendingLayout = v.findViewById(R.id.senderLinearLayout);
-            messageTextViewReceiving = v.findViewById(R.id.recyclerViewChatMessageTextReceive);
-            profileImageCircleViewReceiving = v.findViewById(R.id.recyclerViewChatProfileImageReceive);
-            messageTextViewSending = v.findViewById(R.id.recyclerViewChatMessageTextSending);
-            profileImageCircleViewSending = v.findViewById(R.id.recyclerViewChatProfileImageSending);
-
-            background.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    hideKeyboard((Activity) v.getContext());
-                }
-            });
-        }
-    }
-
     // Create new views (invoked by the layout manager)
     @Override
-    public MessageAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent,
-                                                                        int viewType) {
-        // create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate
-                (R.layout.message_text_view, parent, false);
+    public MessageHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         context = parent.getContext();
 
         mAuth = FirebaseAuth.getInstance();
-        mRoot = FirebaseDatabase.getInstance().getReference().child("users");
-        return new MyViewHolder(v);
+        mRoot = FirebaseDatabase.getInstance().getReference()
+                .child(context.getResources().getString(R.string.database_user));
+
+        //new view
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.message_text_view, parent, false);
+
+        return new MessageHolder(view);
     }
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, int position) {
+    public void onBindViewHolder(final MessageHolder holder, int position) {
         final Message message = messageList.get(position);
 
         String fromUserId = message.getFromUserId();
@@ -134,7 +93,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
                     context.getResources().getString(R.string.database_message_type_audio)))
             {//MSG TYPE = audio
 
-                holder.messageTextViewSending.setText("Click to play");
+                holder.messageTextViewSending
+                        .setText(context.getResources().getString(R.string.chat_audio_chat_view_message));
                 holder.messageTextViewSending.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -147,12 +107,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
             else if(messageType.equalsIgnoreCase(
                     context.getResources().getString(R.string.database_message_type_chipmunk_audio)))
             {//MSG TYPE = chipmunk audio
-                holder.messageTextViewSending.setText("Click to play");
+                holder.messageTextViewSending
+                        .setText(context.getResources().getString(R.string.chat_audio_chat_view_message));
                 holder.messageTextViewSending.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         try {
-                            fetchFiltredAudioFileFromFirebase(message.getMessage());
+                            fetchFilteredAudioFileFromFirebase(message.getMessage());
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         } catch (ExecutionException e) {
@@ -162,6 +123,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
                 });
             }
             else{//MSG TYPE = text
+
             }
 
         }
@@ -172,7 +134,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
             if(messageType.equalsIgnoreCase(
                     context.getResources().getString(R.string.database_message_type_audio)))
             {//MSG TYPE = audio
-                holder.messageTextViewReceiving.setText("Click to play");
+                holder.messageTextViewReceiving
+                        .setText(context.getResources().getString(R.string.chat_audio_chat_view_message));
                 holder.messageTextViewReceiving.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -185,12 +148,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
             else if(messageType.equalsIgnoreCase(
                     context.getResources().getString(R.string.database_message_type_chipmunk_audio)))
             {//MSG TYPE = chipmunk audio
-                holder.messageTextViewReceiving.setText("Click to play");
+                holder.messageTextViewReceiving
+                        .setText(context.getResources().getString(R.string.chat_audio_chat_view_message));
                 holder.messageTextViewReceiving.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         try {
-                            fetchFiltredAudioFileFromFirebase(message.getMessage());
+                            fetchFilteredAudioFileFromFirebase(message.getMessage());
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         } catch (ExecutionException e) {
@@ -206,12 +170,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
         }
     }
 
+
     private void setProfilePictureChat(DatabaseReference chatUser,
                                        final CircleImageView profileImageHolder) {
         chatUser.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String profileImageUri = dataSnapshot.child("userThumbImage")
+                String profileImageUri = dataSnapshot
+                        .child(context.getResources().getString(R.string.database_user_thumb_image))
                         .getValue().toString();
                 //load the profile picture, if not set yet use default pict stored in the app.
                 Picasso.get().load(profileImageUri)
@@ -249,8 +215,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
         }
     }
 
-    private void fetchFiltredAudioFileFromFirebase(final String url) throws ExecutionException, InterruptedException {
-        Log.d("test log", "fetching now ..");
+    private void fetchFilteredAudioFileFromFirebase(final String url) throws ExecutionException, InterruptedException {
         new DownloadFileFromURL().execute(url);
 
         File localFile = new File( Environment
@@ -296,29 +261,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    private static void downloadFile(String url, File outputFile) {
-        try {
-            URL u = new URL(url);
-            URLConnection conn = u.openConnection();
-            int contentLength = conn.getContentLength();
-
-            DataInputStream stream = new DataInputStream(u.openStream());
-
-            byte[] buffer = new byte[contentLength];
-            stream.readFully(buffer);
-            stream.close();
-
-            DataOutputStream fos = new DataOutputStream(new FileOutputStream(outputFile));
-            fos.write(buffer);
-            fos.flush();
-            fos.close();
-        } catch(FileNotFoundException e) {
-            return; // swallow a 404
-        } catch (IOException e) {
-            return; // swallow a 404
         }
     }
 

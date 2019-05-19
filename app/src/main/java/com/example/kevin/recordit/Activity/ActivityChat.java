@@ -63,15 +63,28 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+/**
+ * @author Kevin
+ *
+ * This the activity for the chatting page,
+ * people can send text message, audio message and voice filter (1).
+ * There is still a bug to fix:
+ *  - messages are acting wierd.
+ *  - audio file need to be initilize as
+ *      default link audio message first (find a work around!)
+ *
+ * the Activity chat uses recyclerview, with MessageAdapter and MessageHolder
+ * to show the message. Messages are stored in firebaseDatabase (realtime).
+ */
 public class ActivityChat extends AppCompatActivity {
+    private static final String LOG_TAG = "ActivityChat";
     private static final int MAX_CHARS_MESSAGE = 200;
-    private static final String ERR_MAX_CHAR = "Maximum char is "+MAX_CHARS_MESSAGE+" chars";
+
     /////////////////////////////for the audio recording///////////////////
-    private static final String LOG_TAG = "AudioRecordTest";
-    private static String mFileName = null;
     //temp local file name for storing and retrieving audio file
     private static String TEMP_FILTER_AUDIO_NAME = "tempAudio.pcm";
     private static String TEMP_FILE_AUDIO_NAME = "/audiorecordtest.3gp";
+    private static String mFileName = null;
 
     private StorageReference mStorage;
 
@@ -124,7 +137,7 @@ public class ActivityChat extends AppCompatActivity {
                 intent.getExtras().get(getResources().getString(R.string.extra_user_id)).toString();
 
         setToolbar();
-        setButtonsAndInputMessage();
+        initListener();
 
         fetchMessagesFromFirebaseDatabase();
         chatsView = findViewById(R.id.chatActivityRecyclerViewMessages);
@@ -133,10 +146,18 @@ public class ActivityChat extends AppCompatActivity {
         mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
         mFileName += TEMP_FILE_AUDIO_NAME;
 
+        //check if permission granted, ask if not
         checkAndRequestPermissions();
     }
 
-
+    /**
+     * Checking if permission is granted or not.
+     *  - permission for using microphone : voice message and voice filter message.
+     *  - permission to use the storage : this is so that user can hear the audio file.
+     *         how the audio work will be explain on later in this code.
+     *
+     * @return true if all permissions above are granted.
+     */
     private  boolean checkAndRequestPermissions() {
         int permissionRecordAudio = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.RECORD_AUDIO);
@@ -158,8 +179,8 @@ public class ActivityChat extends AppCompatActivity {
 
     /**
      * initialize the tool bar
-     * - Name
-     * - Status, ThumbImage
+     * - Name.
+     * - Status, ThumbImage.
      */
     private void setToolbar() {
         toolbar = findViewById(R.id.chat_app_bar);
@@ -209,16 +230,16 @@ public class ActivityChat extends AppCompatActivity {
     }
 
     /**
-     * set the send message button to send
-     * also get message from the input message.
-     * initialize select photo
+     * set the everything and initialize
+     * anything that need to have listener.
      */
-    private void setButtonsAndInputMessage() {
+    private void initListener() {
         sendVoiceMessage = findViewById(R.id.chatActivityRecordMessageButton);
         sendChipmunkVoiceMessage = findViewById(R.id.chatActivityChipmunkFilteredRecordMessageButton);
         inputMessage = findViewById(R.id.chatActivityMessageTextView);
         sendMessageBytton = findViewById(R.id.chatActivitySendMessageButton);
 
+        //for normal message
         sendMessageBytton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -228,6 +249,7 @@ public class ActivityChat extends AppCompatActivity {
             }
         });
 
+        //for voice mesaage
         sendVoiceMessage.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -249,6 +271,7 @@ public class ActivityChat extends AppCompatActivity {
             }
         });
 
+        //for voice message with chipmunk filter.
         sendChipmunkVoiceMessage.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -282,7 +305,7 @@ public class ActivityChat extends AppCompatActivity {
 
     /**
      * start recording normal voice message
-     * start when button is push
+     * start when button is push.
      */
     private void startRecording() {
         mRecorder = new MediaRecorder();
@@ -302,22 +325,24 @@ public class ActivityChat extends AppCompatActivity {
 
     /**
      * stop recording normal voice message
-     * stop when button is released
+     * stop when button is released.
+     *
+     * Also this will put the voice message
+     * to the database (Firebase database).
      */
     private void stopRecording() {
         mRecorder.stop();
         mRecorder.release();
         mRecorder = null;
 
-
-        putMessageToFirebase("LINK AUDIO FILE",
+        //Putting message to database.
+        putMessageToFirebase(getResources().getString(R.string.default_link_audio_message),
                 getResources().getString(R.string.database_message_type_audio));
-        //uploadAudio();
     }
 
     /**
      * start the recording using audio recorder - voice message that going to be filter
-     * this example have 15000 hz input ( the drop down does not effect the input audio)
+     * this example have 15000 hz input ( the drop down does not effect the input audio).
      */
     private void startFilterRecord(){
 
@@ -353,7 +378,7 @@ public class ActivityChat extends AppCompatActivity {
 
             audioRecord.stop();
             dataOutputStream.close();
-            putMessageToFirebase("LINK AUDIO FILE",
+            putMessageToFirebase(getResources().getString(R.string.default_link_audio_message),
                     getResources().getString(R.string.database_message_type_chipmunk_audio));
 
         } catch (IOException e) {
@@ -362,9 +387,18 @@ public class ActivityChat extends AppCompatActivity {
 
     }
 
-    private void uploadAudio(final String messageUniqeId, final String thisOnlineUserId, final String receiverUserId) {
+    /**
+     * Uploading audio file to Firebase storage, and also
+     * get the download uri to put in firebase database
+     * as a message with type audio/ audio filter (chipmunk only for now).
+     *
+     * @param messageUniqueId - unique id of the message.
+     * @param thisOnlineUserId - user id who is sending the message.
+     * @param receiverUserId - user id who is receiving the message.
+     */
+    private void uploadAudio(final String messageUniqueId, final String thisOnlineUserId, final String receiverUserId) {
         final StorageReference filepath = mStorage.child(getResources().getString(R.string.storage_audio)).child(
-                messageUniqeId+ getResources().getString(R.string.default_audio_message_file_type));
+                messageUniqueId+ getResources().getString(R.string.default_audio_message_file_type));
 
         final Uri uri = Uri.fromFile(new File(mFileName).getAbsoluteFile());
 
@@ -382,25 +416,36 @@ public class ActivityChat extends AppCompatActivity {
                                 .child(getResources().getString(R.string.database_message))
                                 .child(thisOnlineUserId)
                                 .child(receiverUserId)
-                                .child(messageUniqeId)
+                                .child(messageUniqueId)
                                 .child(getResources().getString(R.string.database_message_input))
                                 .setValue(downloadLinkAudio);
                         rootReference
                                 .child(getResources().getString(R.string.database_message))
                                 .child(receiverUserId)
                                 .child(thisOnlineUserId)
-                                .child(messageUniqeId)
+                                .child(messageUniqueId)
                                 .child(getResources().getString(R.string.database_message_input))
                                 .setValue(downloadLinkAudio);
+                        chatAdapter.notifyDataSetChanged();
                     }
                 });
             }
         });
     }
 
-    private void uploadFilteredAudio(final String messageUniqeId, final String thisOnlineUserId, final String receiverUserId) {
+    /**
+     *
+     * Uploading filtered audio file to Firebase storage, and also
+     * get the download uri to put in firebase database
+     * as a message with type audio/ audio filter (chipmunk only for now).
+     *
+     * @param messageUniqueId - unique id of the message.
+     * @param thisOnlineUserId - user id who is sending the message.
+     * @param receiverUserId - user id who is receiving the message.
+     */
+    private void uploadFilteredAudio(final String messageUniqueId, final String thisOnlineUserId, final String receiverUserId) {
         final StorageReference filepath = mStorage.child("Audio").child(
-                messageUniqeId+ getResources().getString(R.string.default_audio_message_file_type));
+                messageUniqueId+ getResources().getString(R.string.default_audio_message_file_type));
 
         File file = new File(Environment.getExternalStorageDirectory(), TEMP_FILTER_AUDIO_NAME);
         final Uri uri = Uri.fromFile(file);
@@ -420,14 +465,14 @@ public class ActivityChat extends AppCompatActivity {
                                 .child(getResources().getString(R.string.database_message))
                                 .child(thisOnlineUserId)
                                 .child(receiverUserId)
-                                .child(messageUniqeId)
+                                .child(messageUniqueId)
                                 .child(getResources().getString(R.string.database_message_input))
                                 .setValue(downloadLinkAudio);
                         rootReference
                                 .child(getResources().getString(R.string.database_message))
                                 .child(receiverUserId)
                                 .child(thisOnlineUserId)
-                                .child(messageUniqeId)
+                                .child(messageUniqueId)
                                 .child(getResources().getString(R.string.database_message_input))
                                 .setValue(downloadLinkAudio);
                     }
@@ -436,6 +481,11 @@ public class ActivityChat extends AppCompatActivity {
         });
     }
 
+    /**
+     * Send message with normal text.
+     *
+     * @param messageText - the message that  are going to be send.
+     */
     private void sendMessage(String messageText) {
         if(messageText.isEmpty()){
             Toast.makeText(ActivityChat.this,
@@ -443,7 +493,7 @@ public class ActivityChat extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
         }else if(messageText.length() == MAX_CHARS_MESSAGE){
             Toast.makeText(ActivityChat.this,
-                    ERR_MAX_CHAR,
+                    getResources().getString(R.string.chat_err_message_too_long),
                     Toast.LENGTH_LONG).show();
         }
         else{
@@ -453,10 +503,10 @@ public class ActivityChat extends AppCompatActivity {
     }
 
     /**
-     * put message to firebase
+     * Put message to Firebase
      * can handle type text and audio
-     * @param messageText - > string of the message
-     * @param typeMessage - > string of the file name audio in firebase storage
+     * @param messageText - string of the message.
+     * @param typeMessage - string of the file name audio in Firebase storage.
      */
     private void putMessageToFirebase(String messageText,String typeMessage) {
         String messageSenderPath =
@@ -466,12 +516,13 @@ public class ActivityChat extends AppCompatActivity {
                 getResources().getString(R.string.database_message) + "/" +
                         receiverUserId + "/" + thisOnlineUserId;
 
-        DatabaseReference messageKeyRefrence = rootReference
+        DatabaseReference messageKeyReference = rootReference
                 .child(getResources().getString(R.string.database_message))
                 .child(thisOnlineUserId)
                 .child(receiverUserId)
                 .push();
-        String messageUniqeId = messageKeyRefrence.getKey();
+
+        String messageUniqueId = messageKeyReference.getKey();
 
         Map messageDetailHashmap = new HashMap();
 
@@ -479,39 +530,37 @@ public class ActivityChat extends AppCompatActivity {
         messageDetailHashmap.put(getResources().getString(R.string.database_message_time),
                 ServerValue.TIMESTAMP);
 
-
-
         messageDetailHashmap.put(getResources().getString(R.string.database_message_from),
                 thisOnlineUserId);
 
         if(typeMessage.equalsIgnoreCase(
-                getResources().getString(R.string.database_message_type_text))){
+                getResources().getString(R.string.database_message_type_text)))
+        {
             messageDetailHashmap.put(getResources().getString(R.string.database_message_input),messageText);
             messageDetailHashmap.put(getResources().getString(R.string.database_message_type),
                     getResources().getString(R.string.database_message_type_text));
         }else if(typeMessage.equalsIgnoreCase(
                 getResources().getString(R.string.database_message_type_chipmunk_audio)))
         {
-            uploadFilteredAudio(messageUniqeId,thisOnlineUserId,receiverUserId);
+            uploadFilteredAudio(messageUniqueId,thisOnlineUserId,receiverUserId);
             messageDetailHashmap.put(getResources().getString(R.string.database_message_type),
                     getResources().getString(R.string.database_message_type_chipmunk_audio));
             messageDetailHashmap.put(getResources().getString(R.string.database_message_input),
                     "link file");
 
+        }else
+        {
+        uploadAudio(messageUniqueId,thisOnlineUserId,receiverUserId);
+        messageDetailHashmap.put(getResources().getString(R.string.database_message_type),
+                getResources().getString(R.string.database_message_type_audio));
+        messageDetailHashmap.put(getResources().getString(R.string.database_message_input),
+                "link file");
         }
-            else
-            {
-            uploadAudio(messageUniqeId,thisOnlineUserId,receiverUserId);
-            messageDetailHashmap.put(getResources().getString(R.string.database_message_type),
-                    getResources().getString(R.string.database_message_type_audio));
-            messageDetailHashmap.put(getResources().getString(R.string.database_message_input),
-                    "link file");
-            }
 
         Map messageHashmap = new HashMap();
 
-        messageHashmap.put(messageSenderPath + "/" + messageUniqeId, messageDetailHashmap);
-        messageHashmap.put(messageReceiverPath + "/" + messageUniqeId, messageDetailHashmap);
+        messageHashmap.put(messageSenderPath + "/" + messageUniqueId, messageDetailHashmap);
+        messageHashmap.put(messageReceiverPath + "/" + messageUniqueId, messageDetailHashmap);
 
         rootReference.updateChildren(messageHashmap, new DatabaseReference.CompletionListener() {
             @Override
@@ -524,6 +573,13 @@ public class ActivityChat extends AppCompatActivity {
         });
     }
 
+
+    /**
+     * fetching data from firebase to array of message that we use
+     * to display the messages in a chat.
+     *
+     * Bug: acting un-normal sometimes.
+     */
     private void fetchMessagesFromFirebaseDatabase() {
         rootReference
                 .child(getResources().getString(R.string.database_message))
@@ -567,12 +623,15 @@ public class ActivityChat extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.d("test","cancelled");
 
                     }
                 });
     }
 
+    /**
+     * Starting recycler view and connect it to
+     * the message adapter.
+     */
     private void setRecyclerView() {
         // use a linear layout manager
         chatLinearLayout = new LinearLayoutManager(this);

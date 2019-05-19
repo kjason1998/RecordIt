@@ -28,7 +28,11 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
 /**
- * login activity
+ * login activity is for users to log in and
+ * they will be ask to fill the user's email
+ * and password. ( using Firebase Auth ).
+ *
+ * @author Kevin
  */
 public class ActivityLogin extends AppCompatActivity {
 

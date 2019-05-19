@@ -100,6 +100,7 @@ public class FriendsFragment extends Fragment {
                         .setQuery(query, User.class)
                         .build();
 
+        //Adapter from FirebaseUI
         FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<User, FriendsHolder>(options) {
             @Override
             public FriendsHolder onCreateViewHolder(ViewGroup parent, int viewType) {

@@ -7,6 +7,7 @@
     <string name="default_profile_picture_file_type">.jpg</string>
     <string name="default_audio_message_file_type">.3gp</string>
     <string name="default_date_format">dd-MMMM-YYYY</string>
+    <string name="default_link_audio_message">AUDIO LINK FILE CANNOT BE FIND</string>
 
     <!--name for database users -->
     <string name="database_user">users</string>
@@ -56,6 +57,20 @@
     <string name="login_loading_dialog_message">Please wait a moment</string>
     <string name="login_err_email_password_incorrect">Email or password is incorrect</string>
 
+    <!-- Register activity-->
+    <string name="register_app_bar_title">Sign up</string>
+    <string name="register_loading_dialog_title">Creating new account</string>
+    <string name="register_loading_dialog_message">Please wait a moment</string>
+    <string name="register_err_name_empty">Please enter name</string>
+    <string name="register_err_email_empty">Please enter Email</string>
+    <string name="register_err_password_empty">Please enter password</string>
+    <string name="register_err_failed">Please check email and make sure to check internet connectivity</string>
+    <!-- don't forget to change the int values (in the Register activity) when changing this -->
+    <string name="register_err_name_too_short">Name need to be at least 3 characters</string>
+    <string name="register_err_name_too_long">Name maximum is 20 characters</string>
+    <string name="register_err_password_too_short">Password is to short, minimum 7 characters</string>
+
+
     <!-- Main activity-->
     <string name="main_app_bar_title">RecordIt</string>
 
@@ -71,17 +86,21 @@
     <!-- chat activity-->
     <string name="chat_message_text_view_hint">Enter message!</string>
     <string name="chat_activity_err_empty_message">Looks like the message are empty</string>
+    <!-- do not forget to change the int value in Activity chat if this is value is changes !-->
+    <string name="chat_err_message_too_long">Message are too long, maximum character is 200</string>
     <string name="chat_toast_audio">Audio sent</string>
     <string name="chat_err_audio">Audio did not sent</string>
     <string name="chat_toast_start_record">Start speaking</string>
     <string name="chat_toast_stop_record">Audio recorded, will send shortly</string>
     <!-- chat activity chat text message view-->
     <string name="chat_message_chat_view_message">Display message</string>
+    <string name="chat_audio_chat_view_message">Click to play</string>
 
     <!-- search user activity-->
     <string name="search_user_app_bar_title">User list</string>
     <string name="search_user_input_box_hint">Find..</string>
     <string name="search_user_search_button">Search</string>
+    <string name="search_user_err_empty">Input is empty</string>
 
     <!-- profile activity-->
     <string name="profile_app_bar_title">Profile</string>

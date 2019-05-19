@@ -32,14 +32,6 @@ public class ActivityRegister extends AppCompatActivity {
     private static final int MIN_NAME_LENG = 3;
     private static final int MAX_NAME_LENG = 20;
 
-    private static final String ERR_INPUT_EMPTY = "One or more field are empty";
-    private static final String ERR_PASS_MIN = "Password need to be at least " + MIN_PASS_LENG
-            + " characters";
-    private static final String ERR_NAME_MIN = "Name need to be at least " + MIN_NAME_LENG
-            + " characters";
-    private static final String ERR_NAME_MAX = "Maximum character for name is exceeded, max " + MAX_NAME_LENG
-            + " characters";
-
     private FirebaseAuth mAuth;
     private DatabaseReference mRootRef;
 
@@ -61,18 +53,18 @@ public class ActivityRegister extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        background = (LinearLayout) findViewById(R.id.register_background);
+        background = findViewById(R.id.register_background);
 
-        mToolbar = (Toolbar) findViewById(R.id.register_tool_bar);
+        mToolbar = findViewById(R.id.register_tool_bar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Sign up");
+        getSupportActionBar().setTitle(getResources().getString(R.string.register_app_bar_title));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        registerName = (EditText) findViewById(R.id.fillTextName);
-        registerEmail = (EditText) findViewById(R.id.fillTextEmail);
-        registerPassword= (EditText) findViewById(R.id.fillTextPassword);
+        registerName = findViewById(R.id.fillTextName);
+        registerEmail =  findViewById(R.id.fillTextEmail);
+        registerPassword =  findViewById(R.id.fillTextPassword);
 
-        createAccount = (Button) findViewById(R.id.buttonCreateAccount);
+        createAccount = findViewById(R.id.buttonCreateAccount);
         loadingDialog = new ProgressDialog(this);
 
         createAccount.setOnClickListener(new View.OnClickListener() {
@@ -99,28 +91,42 @@ public class ActivityRegister extends AppCompatActivity {
         //check the EditText validation
         if(TextUtils.isEmpty(name)){
             Toast.makeText
-                    (ActivityRegister.this,ERR_INPUT_EMPTY,Toast.LENGTH_LONG).show();
+                    (ActivityRegister.this,
+                            getResources().getString(R.string.register_err_name_empty),
+                            Toast.LENGTH_LONG).show();
         }
         else if(TextUtils.isEmpty(email)){
             Toast.makeText
-                    (ActivityRegister.this,ERR_INPUT_EMPTY,Toast.LENGTH_LONG).show();
+                    (ActivityRegister.this,
+                            getResources().getString(R.string.register_err_email_empty),
+                            Toast.LENGTH_LONG).show();
         }
         else if(TextUtils.isEmpty(password)){
             Toast.makeText
-                    (ActivityRegister.this,ERR_INPUT_EMPTY,Toast.LENGTH_LONG).show();
+                    (ActivityRegister.this,
+                            getResources().getString(R.string.register_err_password_empty),
+                            Toast.LENGTH_LONG).show();
         }else if(name.length() < MIN_NAME_LENG){
             Toast.makeText
-                    (ActivityRegister.this,ERR_NAME_MIN,Toast.LENGTH_LONG).show();
+                    (ActivityRegister.this,
+                            getResources().getString(R.string.register_err_name_too_short),
+                            Toast.LENGTH_LONG).show();
         }else if(name.length() > MAX_NAME_LENG){
             Toast.makeText
-                    (ActivityRegister.this,ERR_NAME_MAX,Toast.LENGTH_LONG).show();
+                    (ActivityRegister.this,
+                            getResources().getString(R.string.register_err_name_too_long),
+                            Toast.LENGTH_LONG).show();
         }
         else if(password.length() < MIN_PASS_LENG){
             Toast.makeText
-                    (ActivityRegister.this,ERR_PASS_MIN,Toast.LENGTH_LONG).show();
+                    (ActivityRegister.this,
+                            getResources().getString(R.string.register_err_password_too_short),
+                            Toast.LENGTH_LONG).show();
         }else{
-            loadingDialog.setTitle("Creating new account");
-            loadingDialog.setMessage("Please wait until account created");
+            loadingDialog.setTitle(
+                    getResources().getString(R.string.register_loading_dialog_title));
+            loadingDialog.setMessage(
+                    getResources().getString(R.string.register_loading_dialog_message));
             loadingDialog.show();
 
             mAuth.createUserWithEmailAndPassword(email,password)
@@ -132,11 +138,15 @@ public class ActivityRegister extends AppCompatActivity {
                                 String currentUserId = mAuth.getCurrentUser().getUid();
                                 //store the reference from the firebase
                                 mRootRef = FirebaseDatabase.getInstance().getReference()
-                                        .child("users").child(currentUserId);
-                                mRootRef.child("userName").setValue(name);
-                                mRootRef.child("userStatus").setValue("Online");
-                                mRootRef.child("userImage").setValue("default_Profile");
-                                mRootRef.child("userThumbImage").setValue("default_image");
+                                        .child(getResources().getString(R.string.database_user)).child(currentUserId);
+                                mRootRef.child(getResources().getString(R.string.database_user_name))
+                                        .setValue(name);
+                                mRootRef.child(getResources().getString(R.string.database_user_status))
+                                        .setValue(getResources().getString(R.string.default_status));
+                                mRootRef.child(getResources().getString(R.string.database_user_profile_picture))
+                                        .setValue(getResources().getString(R.string.default_profile_picture));
+                                mRootRef.child(getResources().getString(R.string.database_user_thumb_image))
+                                        .setValue(getResources().getString(R.string.default_thumb_image));
                                 FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
                                     @Override
                                     public void onSuccess(InstanceIdResult instanceIdResult) {
@@ -162,8 +172,8 @@ public class ActivityRegister extends AppCompatActivity {
                             }
                             else{
                                 Toast.makeText(ActivityRegister.this,
-                                        "Make sure to have valid Email address " +
-                                                task.toString(),Toast.LENGTH_LONG).show();
+                                        getResources().getString(R.string.register_err_failed),
+                                        Toast.LENGTH_LONG).show();
                             }
                             loadingDialog.dismiss();
                         }

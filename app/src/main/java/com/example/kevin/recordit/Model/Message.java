@@ -56,10 +56,6 @@ public class Message {
     public String toString() {
         return "Message{" +
                 "message='" + message + '\'' +
-                ", readStatus=" + readStatus +
-                ", time=" + time +
-                ", type='" + type + '\'' +
-                ", fromUserId='" + fromUserId + '\'' +
                 '}';
     }
 }
