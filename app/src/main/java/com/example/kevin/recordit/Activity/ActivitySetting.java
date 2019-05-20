@@ -37,6 +37,11 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
 
+/**
+ * Do the setting, of the profile
+ *  - Profile picture (firebase only allow 10mb file, atm).
+ *  - status (by invoking another activity - activityStatus).
+ */
 public class ActivitySetting extends AppCompatActivity {
     private Toolbar mToolbar;
 
@@ -75,16 +80,22 @@ public class ActivitySetting extends AppCompatActivity {
         mToolbar = findViewById(R.id.setting_app_bar);
         setMToolbar();
 
-        settingUpAcctivity();
+        settingUpActivity();
         initEventListener();
     }
 
+    /**
+     * Initialize the tool bar/
+     */
     private void setMToolbar() {
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(getResources().getString(R.string.setting_app_bar_title));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    /**
+     * Initialize everything that have listener.
+     */
     private void initEventListener() {
         settingUserProfilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,7 +119,14 @@ public class ActivitySetting extends AppCompatActivity {
         });
     }
 
-    private void settingUpAcctivity() {
+    /**
+     * Load the current data of
+     * the current user.
+     *  - profile and thumbImage
+     *  - name
+     *  - status.
+     */
+    private void settingUpActivity() {
         getUserDataRefrence.addValueEventListener(new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -139,6 +157,15 @@ public class ActivitySetting extends AppCompatActivity {
     });
     }
 
+    /**
+     * Getting the crop of the image
+     * that have been cropped and
+     * use it as a profile image of the current user online.
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

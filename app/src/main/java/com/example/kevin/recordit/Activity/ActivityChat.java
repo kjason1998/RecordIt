@@ -178,7 +178,7 @@ public class ActivityChat extends AppCompatActivity {
     }
 
     /**
-     * initialize the tool bar
+     * Initialize the tool bar
      * - Name.
      * - Status, ThumbImage.
      */
@@ -230,8 +230,7 @@ public class ActivityChat extends AppCompatActivity {
     }
 
     /**
-     * set the everything and initialize
-     * anything that need to have listener.
+     * Initialize all listener
      */
     private void initListener() {
         sendVoiceMessage = findViewById(R.id.chatActivityRecordMessageButton);

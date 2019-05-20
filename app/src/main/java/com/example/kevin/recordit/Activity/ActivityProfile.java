@@ -31,6 +31,15 @@ import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+/**
+ * ActivityProfile is where people can
+ * do adding and receiving friend request.
+ * Also current user can see some information
+ * about the user that owns the profile
+ * page.
+ *
+ * @author Kevin
+ */
 public class ActivityProfile extends AppCompatActivity {
     private Toolbar mToolbar;
 
@@ -99,6 +108,8 @@ public class ActivityProfile extends AppCompatActivity {
                 .child(getIntent().getExtras().get(getResources().
                         getString(R.string.extra_user_id)).toString());
 
+        setRelation();
+
         //set the profile picture,name and status of the viewed user's profile page
         setProfileInfo(getUserProfileDataReference);
 
@@ -108,23 +119,23 @@ public class ActivityProfile extends AppCompatActivity {
 
     }
 
+    /**
+     * Initialize tool bar.
+     */
     private void setMToolbar() {
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(getResources().getString(R.string.profile_app_bar_title));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    private void setButton(final DatabaseReference getCurrentUserDataReference,
-                           final DatabaseReference getUserProfileDataReference) {
-
-
-        //make sure user cant add them self by set the add button gone
-        //when viewing own profile page
-        if(getCurrentUserDataReference.equals(getUserProfileDataReference)){
-            addFriendButton.setVisibility(View.GONE);
-        }
-
-        
+    /**
+     * Setting relation based on the data
+     * from database.
+     *  - not_friend
+     *  - friend
+     *  - friend request are send
+     */
+    private void setRelation() {
         friendRequestReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -153,7 +164,6 @@ public class ActivityProfile extends AppCompatActivity {
                                         if(RELATION_CURRENT_USER.equalsIgnoreCase
                                                 (getResources().getString(R.string.database_friend_request_receive))){
                                             setAcceptDeclineButton();
-                                            addFriendButton.setVisibility(View.GONE);
                                         }
                                     }
                                 }
@@ -189,14 +199,8 @@ public class ActivityProfile extends AppCompatActivity {
 
                                             }
                                         });
-
                             }
-                            /*else{
-                                RELATION_CURRENT_USER =
-                                        getResources().getString(R.string.relation_no_relation);
-                            }*/
                         }
-
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -204,37 +208,156 @@ public class ActivityProfile extends AppCompatActivity {
                     });
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
+    }
 
-        addFriendButton.setOnClickListener(new View.OnClickListener() {
+    /**
+     * Setting accept and decline button and make adding
+     * button disappeared,only called if the status
+     * between current user and owner of the profile
+     * that are being view are "friend request are send"
+     */
+    private void setAcceptDeclineButton() {
+        acceptFriendRequest.setVisibility(View.VISIBLE);
+        declineFriendRequest.setVisibility(View.VISIBLE);
+
+        addFriendButton.setVisibility(View.GONE);
+
+        acceptFriendRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //so that the user cant click it too fast, until the user add
-                //process are finish the button cant be click.
-                addFriendButton.setEnabled(false);
-
-                if(RELATION_CURRENT_USER.equalsIgnoreCase
-                        (getResources().getString(R.string.relation_no_relation))){
-                    sendFriendRequestTo();
-                }
-                else if(RELATION_CURRENT_USER.equalsIgnoreCase
-                        (getResources().getString(R.string.database_friend_request_sent))){
-                    removeFriendRequest();
-                }
-                else if(RELATION_CURRENT_USER.equalsIgnoreCase
-                        (getResources().getString(R.string.relation_friend))){
-                    unfriend();
-                }
+                acceptFriendRequest();
+            }
+        });
+        declineFriendRequest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeFriendRequest();
             }
         });
     }
 
-    //un friend a friend
+    /**
+     * Initialize the buttons.
+     *  - adding friend button  -> will not show if viewing own profile,
+     *                          -> if click twice will cancel.
+     *  -
+     * @param getCurrentUserDataReference - current user reference
+     * @param getUserProfileDataReference - the user's reference that the profile being view
+     */
+    private void setButton(final DatabaseReference getCurrentUserDataReference,
+                           final DatabaseReference getUserProfileDataReference) {
+
+
+        //make sure user cant add them self by set the add button gone
+        //when viewing own profile page
+        if(getCurrentUserDataReference.equals(getUserProfileDataReference)){
+            addFriendButton.setVisibility(View.GONE);
+        }else{
+            addFriendButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //so that the user cant click it too fast, until the user add
+                    //process are finish the button cant be click.
+                    addFriendButton.setEnabled(false);
+
+                    if(RELATION_CURRENT_USER.equalsIgnoreCase
+                            (getResources().getString(R.string.relation_no_relation))){
+                        sendFriendRequestTo();
+                    }
+                    else if(RELATION_CURRENT_USER.equalsIgnoreCase
+                            (getResources().getString(R.string.database_friend_request_sent))){
+                        removeFriendRequest();
+                    }
+                    else if(RELATION_CURRENT_USER.equalsIgnoreCase
+                            (getResources().getString(R.string.relation_friend))){
+                        unfriend();
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * Sending friend request from
+     * current user online to user that
+     * own the profile that is being view
+     *
+     * updating the friendRequest database,
+     * of both the sender and the receiver.
+     *
+     * - Update the current status to "friend request are send"
+     */
+    private void sendFriendRequestTo() {
+        //putting sending request to database
+        friendRequestReference
+                .child(getCurrentUserDataReference.getKey())
+                .child(getUserProfileDataReference.getKey())
+                .child(getResources().getString(R.string.database_friend_request_progress))
+                .setValue(getResources().getString(R.string.database_friend_request_sent))
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            //putting receiving request to database
+                            friendRequestReference
+                                    .child(getUserProfileDataReference.getKey())
+                                    .child(getCurrentUserDataReference.getKey())
+                                    .child(getResources().getString(R.string.database_friend_request_progress))
+                                    .setValue(getResources().getString(R.string.database_friend_request_receive))
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful()){
+                                                //putting the request to the database
+                                                HashMap<String,String> notificationDetail =
+                                                        new HashMap<String,String>();
+                                                notificationDetail.put
+                                                        (getResources().getString(R.string.database_notification_from),
+                                                                getCurrentUserDataReference.getKey());
+                                                notificationDetail.put
+                                                        (getResources().getString(R.string.database_notification_type),
+                                                                getResources().getString(R.string.database_notification_type_request));
+
+                                                notificationsReference.child(getUserProfileDataReference.getKey())
+                                                        .push().setValue(notificationDetail)
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if(task.isSuccessful()){
+                                                                    addFriendButton.setEnabled(true);
+                                                                    RELATION_CURRENT_USER =
+                                                                            getResources().getString(
+                                                                                    R.string.relation_sending_friendRequest);
+                                                                    Toast.makeText(ActivityProfile.this,
+                                                                            getResources().getString(R.string.profile_toast_adding),
+                                                                            Toast.LENGTH_LONG)
+                                                                            .show();
+                                                                    refreshActivity();
+                                                                }
+                                                            }
+                                                        });
+                                            }
+                                        }
+                                    });
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Unfriend method is for unfriend the
+     * current user online and the user
+     * that the profile is being view.
+     * Also, this will remove the friend
+     * inside the friendList database
+     *
+     * - Update the current status to not friend
+     */
     private void unfriend() {
         friendListReference.child(getCurrentUserDataReference.getKey())
                 .child(getUserProfileDataReference.getKey())
@@ -263,26 +386,15 @@ public class ActivityProfile extends AppCompatActivity {
                 });
     }
 
-    // setting accept and decline button
-    private void setAcceptDeclineButton() {
-        acceptFriendRequest.setVisibility(View.VISIBLE);
-        declineFriendRequest.setVisibility(View.VISIBLE);
-        
-        acceptFriendRequest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                acceptFriendRequest();
-            }
-        });
-        declineFriendRequest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                removeFriendRequest();
-            }
-        });
-    }
-
-    //accepting friend request
+    /**
+     * Accepting friend request
+     * and update the friendList
+     * database, also this will remove
+     * the friend request in the friendRequests
+     * database.
+     *
+     * - Update the current status to friend
+     */
     private void acceptFriendRequest() {
         Calendar date = Calendar.getInstance();
         SimpleDateFormat currentDateFormat = new SimpleDateFormat
@@ -336,7 +448,14 @@ public class ActivityProfile extends AppCompatActivity {
                 });
     }
 
-    //cancel friend request if friend request is being sent
+    /**
+     * Declining friend request,
+     * also this will remove
+     * the friend request in the friendRequests
+     * database.
+     *
+     * - Update the current status to not friend
+     */
     private void removeFriendRequest() {
         //removing sending request from the database
         friendRequestReference
@@ -370,65 +489,12 @@ public class ActivityProfile extends AppCompatActivity {
         });
     }
 
-    //to add friend from current user to other user
-    private void sendFriendRequestTo() {
-        //putting sending request to database
-        friendRequestReference
-                .child(getCurrentUserDataReference.getKey())
-                .child(getUserProfileDataReference.getKey())
-                .child(getResources().getString(R.string.database_friend_request_progress))
-                .setValue(getResources().getString(R.string.database_friend_request_sent))
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
-                            //putting receiving request to database
-                            friendRequestReference
-                                    .child(getUserProfileDataReference.getKey())
-                                    .child(getCurrentUserDataReference.getKey())
-                                    .child(getResources().getString(R.string.database_friend_request_progress))
-                                    .setValue(getResources().getString(R.string.database_friend_request_receive))
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if(task.isSuccessful()){
-                                                //putting the request to the database
-                                                HashMap<String,String> notificationDetail =
-                                                        new HashMap<String,String>();
-                                                notificationDetail.put
-                                                        (getResources().getString(R.string.database_notification_from),
-                                                                getCurrentUserDataReference.getKey());
-                                                notificationDetail.put
-                                                        (getResources().getString(R.string.database_notification_type),
-                                                                getResources().getString(R.string.database_notification_type_request));
-
-                                                notificationsReference.child(getUserProfileDataReference.getKey())
-                                                        .push().setValue(notificationDetail)
-                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<Void> task) {
-                                                                if(task.isSuccessful()){
-                                                                    addFriendButton.setEnabled(true);
-                                                                    RELATION_CURRENT_USER =
-                                                                            getResources().getString(
-                                                                                    R.string.relation_sending_friendRequest);
-                                                                    Toast.makeText(ActivityProfile.this,
-                                                                            getResources().getString(R.string.profile_toast_adding),
-                                                                                    Toast.LENGTH_LONG)
-                                                                            .show();
-                                                                    refreshActivity();
-                                                                }
-                                                            }
-                                                        });
-                                            }
-                                        }
-                                    });
-                        }
-                    }
-                });
-    }
-
-    // setting up all the user's profile information that are being viewed.
+    /**
+     * setting up all the user's profile
+     * information that are being viewed.
+     *
+     * @param getUserProfileDataReference - reference to the user that owns the profile
+     */
     private void setProfileInfo(DatabaseReference getUserProfileDataReference) {
         getUserProfileDataReference.addValueEventListener(new ValueEventListener() {
             @Override

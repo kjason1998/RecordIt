@@ -17,6 +17,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+/**
+ * Just to get new status and
+ * change the status into
+ * a new one that have some restrictions.
+ * lower than 32 chars and more than 2 chars.
+ */
 public class ActivityStatus extends AppCompatActivity {
     private Toolbar mToolbar;
     private Button updateStatusButtom;
@@ -44,10 +50,23 @@ public class ActivityStatus extends AppCompatActivity {
                 .child(getResources().getString(R.string.database_user))
                 .child(onlineUId).child(getResources().getString(R.string.database_user_status));
 
+        initMToolBar();
+        initListener();
+    }
+
+    /**
+     * Initialize Toolbar.
+     */
+    private void initMToolBar() {
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(getResources().getString(R.string.status_app_bar_title));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
 
+    /**
+     * Initialize everything that have listener.
+     */
+    private void initListener() {
         updateStatusButtom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,6 +77,14 @@ public class ActivityStatus extends AppCompatActivity {
         });
     }
 
+    /**
+     * To change the status and
+     * check if it is a valid changes.
+     *
+     * Also make sure that user cannot go back when pressing back!
+     *
+     * @param newStatus - the new status.
+     */
     private void changeUserStatus(String newStatus) {
         if(newStatus.isEmpty()){
             Toast.makeText(ActivityStatus.this,getResources().getString(

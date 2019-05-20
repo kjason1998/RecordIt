@@ -8,6 +8,10 @@ import android.widget.Button;
 
 import com.example.kevin.recordit.R;
 
+/**
+ * there will be 2 choice
+ * signing in and signing up.
+ */
 public class ActivityStart extends AppCompatActivity {
 
     private Button signIn;
@@ -21,6 +25,10 @@ public class ActivityStart extends AppCompatActivity {
         signIn = findViewById(R.id.buttonSignIn);
         signUp = findViewById(R.id.buttonSignUp);
 
+        initListener();
+    }
+
+    private void initListener() {
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -29,7 +37,6 @@ public class ActivityStart extends AppCompatActivity {
                 startActivity(signingInIntent);
             }
         });
-
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -38,7 +45,5 @@ public class ActivityStart extends AppCompatActivity {
                 startActivity(signingUpIntent);
             }
         });
-
-
     }
 }

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -47,7 +46,7 @@ public class ActivityLogin extends AppCompatActivity {
     private EditText registerPassword;
 
     private ProgressDialog loadingDialog;
-    private DatabaseReference userRefrence;
+    private DatabaseReference userReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +54,7 @@ public class ActivityLogin extends AppCompatActivity {
         setContentView(R.layout.login_page);
 
         mAuth = FirebaseAuth.getInstance();
-        userRefrence = FirebaseDatabase.getInstance().getReference()
+        userReference = FirebaseDatabase.getInstance().getReference()
                 .child(getResources().getString(R.string.database_user));
 
         mToolbar = findViewById(R.id.login_tool_bar);
@@ -71,6 +70,13 @@ public class ActivityLogin extends AppCompatActivity {
         login = findViewById(R.id.buttonEnter);
         loadingDialog = new ProgressDialog(this);
 
+        initListener();
+    }
+
+    /**
+     * Initialize all listener
+     */
+    private void initListener() {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,9 +95,14 @@ public class ActivityLogin extends AppCompatActivity {
         });
     }
 
-    //using firebase create account
+    /**
+     * Sign in method that use Firebase authentication,
+     * using email and password
+     *
+     * @param email
+     * @param password
+     */
     private void signIn(String email, String password) {
-
         //check the EditText validation
         if(TextUtils.isEmpty(email)){
             Toast.makeText
@@ -119,7 +130,7 @@ public class ActivityLogin extends AppCompatActivity {
                                     public void onSuccess(InstanceIdResult instanceIdResult) {
                                         String deviceToken = instanceIdResult.getToken();
 
-                                        userRefrence.child(onlineUserId)
+                                        userReference.child(onlineUserId)
                                                 .child(getResources().getString(R.string.database_user_token))
                                         .setValue(deviceToken).addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
@@ -154,6 +165,13 @@ public class ActivityLogin extends AppCompatActivity {
         }
 
     }
+
+    /**
+     * This method will hide soft keyboard
+     * if it is called.
+     *
+     * @param activity - the activity that the soft keyboard are in.
+     */
     public static void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         //Find the currently focused view, so we can grab the correct window token from it.

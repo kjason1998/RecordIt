@@ -14,6 +14,12 @@ import com.example.kevin.recordit.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * Activity main is the main page,
+ * in there there is friends page
+ * which show every single friends that
+ * the user have.
+ */
 public class ActivityMain extends AppCompatActivity {
 
     private Toolbar mToolbar;
@@ -31,14 +37,14 @@ public class ActivityMain extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         //Tabs for main act
-        myViewPager = (ViewPager) findViewById(R.id.main_tabs_pager);
+        myViewPager = findViewById(R.id.main_tabs_pager);
         myTabsPagerAdapter = new TabsPageAdapter(getSupportFragmentManager());
         myViewPager.setAdapter(myTabsPagerAdapter);
 
-        myTabLayout = (TabLayout) findViewById(R.id.main_tabs);
+        myTabLayout = findViewById(R.id.main_tabs);
         myTabLayout.setupWithViewPager(myViewPager);
 
-        mToolbar = (Toolbar) findViewById(R.id.home_page_toolbar);
+        mToolbar = findViewById(R.id.home_page_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(getResources().getString(R.string.main_app_bar_title));
     }
@@ -52,14 +58,15 @@ public class ActivityMain extends AppCompatActivity {
 
         /*  disable user to go back to home activity when they press back from start
                 activity since people go from welcome act to main and check if the user are
-                log in or not and send them here if not.
-        */
+                log in or not and send them here if not. */
         if(currentUser == null){
             LogOutUser();
         }
     }
 
-    //send user to start act and log it out
+    /**
+     * This method is for logging out when called
+     */
     private void LogOutUser() {
         Intent startPageIntent =
                 new Intent(ActivityMain.this,ActivityStart.class);

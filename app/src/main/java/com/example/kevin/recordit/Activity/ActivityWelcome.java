@@ -6,6 +6,10 @@ import android.os.Bundle;
 
 import com.example.kevin.recordit.R;
 
+/**
+ * Loading screen for the application
+ * will show the app logo.
+ */
 public class ActivityWelcome extends AppCompatActivity {
 
     @Override

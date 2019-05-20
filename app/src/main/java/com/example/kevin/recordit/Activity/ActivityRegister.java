@@ -27,6 +27,16 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
+/**
+ * Activity Register where people register
+ * using : name, email and paswword
+ * with certain rules.
+ * name < 2 and > 21
+ * email need to be valid
+ * password > 7
+ *
+ * @author Kevin
+ */
 public class ActivityRegister extends AppCompatActivity {
     private static final int MIN_PASS_LENG = 7;
     private static final int MIN_NAME_LENG = 3;
@@ -67,6 +77,13 @@ public class ActivityRegister extends AppCompatActivity {
         createAccount = findViewById(R.id.buttonCreateAccount);
         loadingDialog = new ProgressDialog(this);
 
+        initListener();
+    }
+
+    /**
+     * Initialize all listener.
+     */
+    private void initListener() {
         createAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,7 +102,13 @@ public class ActivityRegister extends AppCompatActivity {
         });
     }
 
-    //using firebase create account
+    /**
+     * Registering using name email and password
+     * with FirebaseAuth
+     * @param name
+     * @param email
+     * @param password
+     */
     private void RegisterAccount(final String name, String email, String password) {
 
         //check the EditText validation

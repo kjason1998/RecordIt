@@ -25,6 +25,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.squareup.picasso.Picasso;
 
+/**
+ * ActivitySearchUser where people can see
+ * everyone else, in order of A-Z,a-z.
+ * also user can search name, and click to promt
+ * the user's profile page
+ *
+ * @author Kevin
+ */
 public class ActivitySearchUser extends AppCompatActivity {
 
     private Toolbar mToolbar;
@@ -52,7 +60,17 @@ public class ActivitySearchUser extends AppCompatActivity {
         initListeners();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        fetch("");
+    }
+
+    /**
+     * Initialize all the listener.
+     */
     private void initListeners() {
+        //automatic search while user are typing.
         searchBar.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -69,7 +87,7 @@ public class ActivitySearchUser extends AppCompatActivity {
 
             }
         });
-
+        //search can be done when the button is clicked
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,6 +96,11 @@ public class ActivitySearchUser extends AppCompatActivity {
         });
     }
 
+    /**
+     * Searching user using the input message
+     * when the input is empty it will shows everything,
+     * and promp a message that the input is empty.
+     */
     private void searchUser(){
         String usernameSearched = searchBar.getText().toString();
         if(TextUtils.isEmpty(usernameSearched)){
@@ -91,12 +114,13 @@ public class ActivitySearchUser extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        fetch("");
-    }
-
+    /**
+     * Getting users from the
+     * database and put it in the
+     * recycler view using firebase adapter
+     *
+     * @param userName - The input of the username that searched.
+     */
     public void fetch(String userName){
         Query query = FirebaseDatabase.getInstance()
                 .getReference()
@@ -111,11 +135,10 @@ public class ActivitySearchUser extends AppCompatActivity {
                         .setQuery(query, User.class)
                         .build();
 
+        //adapter build in by FirebaseUI
         FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<User, UserHolder>(options) {
             @Override
             public UserHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                // Create a new instance of the ViewHolder, in this case we are using a custom
-                // layout called R.layout.message for each item
                 View view = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.card_view_user, parent, false);
 
@@ -145,6 +168,15 @@ public class ActivitySearchUser extends AppCompatActivity {
         adapter.startListening();
     }
 
+    /**
+     * when the card view of a user
+     * is click it will move user to
+     * the profile activity where user
+     * can do adding or receiving
+     * friend reqeust.
+     *
+     * @param userId - the user id of the user that is going to be showed in profile activity.
+     */
     private void goToProfileActivity(String userId) {
         Intent profileIntent = new Intent(ActivitySearchUser.this,ActivityProfile.class);
         profileIntent.putExtra(getResources().getString(R.string.extra_user_id),userId);
